@@ -1,0 +1,13 @@
+# conda env create -f environment.yml
+# conda activate rahat
+# python -m ipykernel install --user --name rahat --display-name "RAHAT (Python 3.12)"
+name: rahat
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - pip>=24
+  - ipykernel
+  - pip:
+      - -e .[dev]

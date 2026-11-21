@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAHAT · Control room sign in</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="exercise-bar">EXERCISE &nbsp; ABHYAS</div>
+<form class="login" id="f">
+  <div class="wordmark">RAHAT <small>Control room</small></div>
+  <p class="muted">Duty officers enter the officer code read out at the start of the exercise.</p>
+  <input id="s" type="password" autocomplete="current-password" placeholder="Officer or admin code" required>
+  <button class="btn" style="width:100%">Sign in</button>
+  <div class="error" id="e"></div>
+</form>
+<script>
+document.getElementById("f").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const r = await fetch("/api/login", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({secret: document.getElementById("s").value})});
+  if (r.ok) location.reload();
+  else document.getElementById("e").textContent = "That code is not valid for the current exercise.";
+};
+</script>
+</body>
+</html>

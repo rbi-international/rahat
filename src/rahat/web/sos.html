@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b2a33">
+<title>RAHAT · Send SOS</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="exercise-bar">EXERCISE &nbsp; ABHYAS &nbsp; EXERCISE</div>
+<main class="phone">
+  <header>
+    <div class="wordmark">RAHAT <small>District flood control room</small></div>
+  </header>
+
+  <section id="waiting" class="closed hide">
+    <h1>Stand by</h1>
+    <p class="muted">You are in. Read your card below. The exercise starts with the siren.</p>
+  </section>
+
+  <section id="ended" class="closed hide">
+    <h1>Exercise terminated</h1>
+    <p class="muted">Look at the main screen for what happened.</p>
+  </section>
+
+  <div id="banner" class="banner hide" role="status"></div>
+
+  <article id="persona" class="card">
+    <h2 id="role-title">Your situation</h2>
+    <div class="situation" id="card">Loading your card…</div>
+  </article>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="send">Send SOS</button>
+    <button role="tab" aria-selected="false" data-tab="ask">Info desk</button>
+  </div>
+
+  <section id="tab-send" class="card">
+    <label for="t" class="muted" style="font-size:14px">Your message to the control room</label>
+    <textarea id="t" maxlength="600" placeholder="Where are you, how many people, how high is the water?"></textarea>
+    <div class="counter num"><span id="len">0</span> / <span id="max">600</span></div>
+    <button class="btn sos" id="send">Send SOS</button>
+    <div class="error" id="err" role="alert"></div>
+  </section>
+
+  <section id="tab-ask" class="card hide">
+    <label for="q" class="muted" style="font-size:14px">Ask the public information desk</label>
+    <textarea id="q" maxlength="300" style="min-height:80px" placeholder="Where is the nearest relief camp?"></textarea>
+    <button class="btn" id="askbtn" style="width:100%;margin-top:10px">Ask</button>
+    <div class="msg hide" id="answer"><div class="reply" id="answertext"></div></div>
+    <div class="error" id="qerr" role="alert"></div>
+  </section>
+
+  <section class="card">
+    <h2>Your messages <span class="muted num" id="sent"></span></h2>
+    <div id="list"><p class="muted">Nothing sent yet.</p></div>
+  </section>
+
+  <p class="muted" style="font-size:13px;text-align:center">This is a training exercise. Do not use real phone numbers. In a real emergency call 112.</p>
+</main>
+<script src="/static/sos.js"></script>
+</body>
+</html>

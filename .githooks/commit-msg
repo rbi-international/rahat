@@ -1,0 +1,9 @@
+#!/bin/sh
+# Keep commits single-author: strip AI attribution trailers from every message.
+# Enabled per clone with: git config core.hooksPath .githooks
+sed -i.bak \
+  -e '/^Co-[Aa]uthored-[Bb]y:.*[Cc]laude/d' \
+  -e '/^Co-[Aa]uthored-[Bb]y:.*noreply@anthropic\.com/d' \
+  -e '/Generated with \[Claude Code\]/d' \
+  -e '/^Claude-Session:/d' \
+  "$1" && rm -f "$1.bak"

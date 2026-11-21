@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      # ruff is pinned in pyproject: a new linter release must never turn main red by itself.
+      - name: Lint
+        run: ruff check src tests scripts
+      # Every test runs on the offline fake lane. If a test ever needs a key, the design regressed.
+      - name: Test
+        run: pytest -q
+      # The eval gate: a short rehearsal against a real server. Triage quality below the bar fails the build.
+      - name: Eval gate (rehearsal on the fake lane)
+        env:
+          PROVIDER: fake
+          ADMIN_TOKEN: ci-admin
+          SOS_COOLDOWN_S: "1"
+        run: |
+          uvicorn rahat.api:app --port 8000 --log-level warning &
+          sleep 3
+          python scripts/simulate_class.py --admin ci-admin --students 40 --minutes 1.2 --second-wave 10 > rehearsal.json || true
+          python scripts/eval_gate.py rehearsal.json
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build container image
+        run: docker build -t rahat:${{ github.sha }} .
+      - name: Smoke test the image
+        run: |
+          docker run -d --name rahat -p 8000:8000 -e PROVIDER=fake rahat:${{ github.sha }}
+          for i in $(seq 1 20); do curl -fs localhost:8000/healthz && exit 0; sleep 1; done
+          docker logs rahat; exit 1

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAHAT · Duty officer console</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="exercise-bar">EXERCISE &nbsp; ABHYAS &nbsp; EXERCISE</div>
+<div class="toolbar">
+  <div>
+    <h1>Duty officer console</h1>
+    <div class="muted" style="font-size:14px" id="sub">Connecting…</div>
+  </div>
+  <div class="filters" id="filters">
+    <button class="chip" aria-pressed="true" data-f="awaiting_approval,blocked">Needs decision</button>
+    <button class="chip" aria-pressed="false" data-f="dispatched">Dispatched</button>
+    <button class="chip" aria-pressed="false" data-f="queued,processing">In pipeline</button>
+    <button class="chip" aria-pressed="false" data-f="">All</button>
+  </div>
+  <div>
+    <a class="btn ghost small" href="/wall" target="_blank" rel="noopener">Open wall</a>
+  </div>
+</div>
+
+<div class="console">
+  <section>
+    <div id="cases"><p class="muted">No cases yet.</p></div>
+  </section>
+
+  <aside>
+    <div class="panel" id="admin">
+      <h2>Exercise control</h2>
+      <div id="session"></div>
+      <div class="inject-grid" style="margin-top:10px">
+        <button class="btn small" data-a="session">Open session</button>
+        <button class="btn small" style="background:var(--p1)" data-a="start">Start exercise</button>
+        <button class="btn small ghost" data-a="river_surge">Ravi surge</button>
+        <button class="btn small ghost" data-a="network_on">Network degraded</button>
+        <button class="btn small ghost" data-a="boat_failure">Boat failure</button>
+        <button class="btn small ghost" data-a="vip">VIP pressure call</button>
+        <button class="btn small ghost" data-a="second_wave">Second wave</button>
+        <button class="btn small ghost" data-a="network_off">Network restored</button>
+        <button class="btn small" data-a="end">Terminate exercise</button>
+        <button class="btn small ghost" data-a="reset">Reset room</button>
+      </div>
+      <div class="error" id="aerr"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Neerdhara allocation</h2>
+      <div class="kv" id="ledger"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Model router (learned from your decisions)</h2>
+      <div class="kv" id="router"><span class="muted">No decisions yet.</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>Audit log</h2>
+      <div class="audit" id="audit"></div>
+    </div>
+  </aside>
+</div>
+<script src="/static/console.js"></script>
+</body>
+</html>

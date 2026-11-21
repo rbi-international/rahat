@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAHAT</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="exercise-bar">EXERCISE &nbsp; ABHYAS &nbsp; NOT A REAL EMERGENCY</div>
+<main class="phone closed">
+  <h1>RAHAT</h1>
+  <p class="muted">Flood response control room, used for training exercises.</p>
+  <p id="why">To take part, scan the QR code shown by your instructor.</p>
+  <p class="muted" style="margin-top:40px;font-size:14px">In a real emergency in India, call 112. Disaster helpline 1070.</p>
+</main>
+<script>
+  if (new URLSearchParams(location.search).get("closed")) {
+    document.getElementById("why").textContent = "This exercise code has expired or the exercise is closed.";
+  }
+</script>
+</body>
+</html>

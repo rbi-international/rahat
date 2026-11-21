@@ -1,0 +1,385 @@
+{
+ "assets": [
+  {
+   "id": "B-01",
+   "kind": "boat",
+   "label": "Boat B-01",
+   "base": "Dera Baba Nanak",
+   "lat": 32.035,
+   "lon": 75.027,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-02",
+   "kind": "boat",
+   "label": "Boat B-02",
+   "base": "Gurdaspur",
+   "lat": 32.041,
+   "lon": 75.405,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-03",
+   "kind": "boat",
+   "label": "Boat B-03",
+   "base": "Ajnala",
+   "lat": 31.843,
+   "lon": 74.762,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-04",
+   "kind": "boat",
+   "label": "Boat B-04",
+   "base": "Ramdas",
+   "lat": 31.966,
+   "lon": 74.906,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-05",
+   "kind": "boat",
+   "label": "Boat B-05",
+   "base": "Batala",
+   "lat": 31.818,
+   "lon": 75.203,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-06",
+   "kind": "boat",
+   "label": "Boat B-06",
+   "base": "Sultanpur Lodhi",
+   "lat": 31.214,
+   "lon": 75.195,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-07",
+   "kind": "boat",
+   "label": "Boat B-07",
+   "base": "Kapurthala",
+   "lat": 31.38,
+   "lon": 75.38,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-08",
+   "kind": "boat",
+   "label": "Boat B-08",
+   "base": "Mukerian",
+   "lat": 31.953,
+   "lon": 75.616,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-09",
+   "kind": "boat",
+   "label": "Boat B-09",
+   "base": "Harike",
+   "lat": 31.165,
+   "lon": 74.947,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-10",
+   "kind": "boat",
+   "label": "Boat B-10",
+   "base": "Ferozepur",
+   "lat": 30.925,
+   "lon": 74.613,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-11",
+   "kind": "boat",
+   "label": "Boat B-11",
+   "base": "Fazilka",
+   "lat": 30.403,
+   "lon": 74.028,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-12",
+   "kind": "boat",
+   "label": "Boat B-12",
+   "base": "Pathankot",
+   "lat": 32.274,
+   "lon": 75.652,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-13",
+   "kind": "boat",
+   "label": "Boat B-13",
+   "base": "Shahkot",
+   "lat": 31.081,
+   "lon": 75.338,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-14",
+   "kind": "boat",
+   "label": "Boat B-14",
+   "base": "Tarn Taran",
+   "lat": 31.451,
+   "lon": 74.927,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-15",
+   "kind": "boat",
+   "label": "Boat B-15",
+   "base": "Dera Baba Nanak",
+   "lat": 32.035,
+   "lon": 75.027,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-16",
+   "kind": "boat",
+   "label": "Boat B-16",
+   "base": "Gurdaspur",
+   "lat": 32.041,
+   "lon": 75.405,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-17",
+   "kind": "boat",
+   "label": "Boat B-17",
+   "base": "Ajnala",
+   "lat": 31.843,
+   "lon": 74.762,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-18",
+   "kind": "boat",
+   "label": "Boat B-18",
+   "base": "Batala",
+   "lat": 31.818,
+   "lon": 75.203,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-19",
+   "kind": "boat",
+   "label": "Boat B-19",
+   "base": "Sultanpur Lodhi",
+   "lat": 31.214,
+   "lon": 75.195,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-20",
+   "kind": "boat",
+   "label": "Boat B-20",
+   "base": "Kapurthala",
+   "lat": 31.38,
+   "lon": 75.38,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-21",
+   "kind": "boat",
+   "label": "Boat B-21",
+   "base": "Harike",
+   "lat": 31.165,
+   "lon": 74.947,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-22",
+   "kind": "boat",
+   "label": "Boat B-22",
+   "base": "Ferozepur",
+   "lat": 30.925,
+   "lon": 74.613,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "B-23",
+   "kind": "boat",
+   "label": "Boat B-23",
+   "base": "Fazilka",
+   "lat": 30.403,
+   "lon": 74.028,
+   "capacity": 8,
+   "speed_kmh": 15
+  },
+  {
+   "id": "N-1",
+   "kind": "ndrf",
+   "label": "NDRF team 1",
+   "base": "Gurdaspur",
+   "lat": 32.041,
+   "lon": 75.405,
+   "capacity": 25,
+   "speed_kmh": 12
+  },
+  {
+   "id": "N-2",
+   "kind": "ndrf",
+   "label": "NDRF team 2",
+   "base": "Amritsar",
+   "lat": 31.634,
+   "lon": 74.872,
+   "capacity": 25,
+   "speed_kmh": 12
+  },
+  {
+   "id": "N-3",
+   "kind": "ndrf",
+   "label": "NDRF team 3",
+   "base": "Kapurthala",
+   "lat": 31.38,
+   "lon": 75.38,
+   "capacity": 25,
+   "speed_kmh": 12
+  },
+  {
+   "id": "N-4",
+   "kind": "ndrf",
+   "label": "NDRF team 4",
+   "base": "Ferozepur",
+   "lat": 30.925,
+   "lon": 74.613,
+   "capacity": 25,
+   "speed_kmh": 12
+  },
+  {
+   "id": "M-1",
+   "kind": "medical",
+   "label": "Medical unit M-1",
+   "base": "Gurdaspur",
+   "lat": 32.041,
+   "lon": 75.405,
+   "capacity": 4,
+   "speed_kmh": 20
+  },
+  {
+   "id": "M-2",
+   "kind": "medical",
+   "label": "Medical unit M-2",
+   "base": "Batala",
+   "lat": 31.818,
+   "lon": 75.203,
+   "capacity": 4,
+   "speed_kmh": 20
+  },
+  {
+   "id": "M-3",
+   "kind": "medical",
+   "label": "Medical unit M-3",
+   "base": "Amritsar",
+   "lat": 31.634,
+   "lon": 74.872,
+   "capacity": 4,
+   "speed_kmh": 20
+  },
+  {
+   "id": "M-4",
+   "kind": "medical",
+   "label": "Medical unit M-4",
+   "base": "Kapurthala",
+   "lat": 31.38,
+   "lon": 75.38,
+   "capacity": 4,
+   "speed_kmh": 20
+  },
+  {
+   "id": "M-5",
+   "kind": "medical",
+   "label": "Medical unit M-5",
+   "base": "Ferozepur",
+   "lat": 30.925,
+   "lon": 74.613,
+   "capacity": 4,
+   "speed_kmh": 20
+  },
+  {
+   "id": "M-6",
+   "kind": "medical",
+   "label": "Medical unit M-6",
+   "base": "Fazilka",
+   "lat": 30.403,
+   "lon": 74.028,
+   "capacity": 4,
+   "speed_kmh": 20
+  }
+ ],
+ "camps": [
+  {
+   "id": "C-1",
+   "name": "Relief camp Batala",
+   "lat": 31.818,
+   "lon": 75.203,
+   "capacity": 600
+  },
+  {
+   "id": "C-2",
+   "name": "Relief camp Amritsar",
+   "lat": 31.634,
+   "lon": 74.872,
+   "capacity": 600
+  },
+  {
+   "id": "C-3",
+   "name": "Relief camp Gurdaspur",
+   "lat": 32.041,
+   "lon": 75.405,
+   "capacity": 600
+  },
+  {
+   "id": "C-4",
+   "name": "Relief camp Kapurthala",
+   "lat": 31.38,
+   "lon": 75.38,
+   "capacity": 600
+  },
+  {
+   "id": "C-5",
+   "name": "Relief camp Ferozepur",
+   "lat": 30.925,
+   "lon": 74.613,
+   "capacity": 600
+  },
+  {
+   "id": "C-6",
+   "name": "Relief camp Fazilka",
+   "lat": 30.403,
+   "lon": 74.028,
+   "capacity": 600
+  },
+  {
+   "id": "C-7",
+   "name": "Relief camp Tarn Taran",
+   "lat": 31.451,
+   "lon": 74.927,
+   "capacity": 600
+  }
+ ]
+}

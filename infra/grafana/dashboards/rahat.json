@@ -1,0 +1,636 @@
+{
+ "title": "RAHAT control room",
+ "uid": "rahat",
+ "schemaVersion": 39,
+ "version": 1,
+ "refresh": "5s",
+ "time": {
+  "from": "now-30m",
+  "to": "now"
+ },
+ "timezone": "browser",
+ "panels": [
+  {
+   "id": 1,
+   "title": "SOS per minute",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum(rate(rahat_sos_received_total[1m]))*60",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 2,
+   "title": "Allocation remaining",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "rahat_allocation_remaining_tokens",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 4,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 3,
+   "title": "Queue depth",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "rahat_queue_depth",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 9,
+    "y": 0,
+    "w": 3,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 4,
+   "title": "In flight",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "rahat_in_flight",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 3,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 5,
+   "title": "Guardrail blocks",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum(rahat_guardrail_blocks_total)",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 15,
+    "y": 0,
+    "w": 3,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 6,
+   "title": "Circuits open",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum(rahat_circuit_open)",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 3,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 7,
+   "title": "Officer approvals",
+   "type": "stat",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum(rahat_officer_decision_total{decision=\"approve\"})",
+     "legendFormat": "",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 21,
+    "y": 0,
+    "w": 3,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "area"
+   }
+  },
+  {
+   "id": 8,
+   "title": "Traffic: SOS accepted vs refused at the door",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum by (channel) (rate(rahat_sos_received_total[1m]))*60",
+     "legendFormat": "accepted {{channel}}",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "expr": "sum by (reason) (rate(rahat_sos_rejected_total[1m]))*60",
+     "legendFormat": "refused {{reason}}",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqpm",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 9,
+   "title": "Tokens per minute by agent",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum by (agent) (rate(rahat_llm_tokens_total[1m]))*60",
+     "legendFormat": "{{agent}}",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 12,
+    "y": 4,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 10,
+   "title": "Model latency p50 / p95",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.5, sum by (le) (rate(rahat_llm_latency_seconds_bucket[2m])))",
+     "legendFormat": "p50",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "expr": "histogram_quantile(0.95, sum by (le) (rate(rahat_llm_latency_seconds_bucket[2m])))",
+     "legendFormat": "p95",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 12,
+    "w": 8,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 11,
+   "title": "SOS to plan p50 / p90",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.5, sum by (le) (rate(rahat_pipeline_seconds_bucket[2m])))",
+     "legendFormat": "p50",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "expr": "histogram_quantile(0.9, sum by (le) (rate(rahat_pipeline_seconds_bucket[2m])))",
+     "legendFormat": "p90",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 8,
+    "y": 12,
+    "w": 8,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 12,
+   "title": "Model calls by result",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum by (result) (rate(rahat_llm_calls_total[1m]))*60",
+     "legendFormat": "{{result}}",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 16,
+    "y": 12,
+    "w": 8,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqpm",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 13,
+   "title": "Triage decisions by priority",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum by (priority) (increase(rahat_triage_priority_total[1m]))",
+     "legendFormat": "{{priority}}",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 20,
+    "w": 8,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 14,
+   "title": "Guardrails by type",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum by (guard) (increase(rahat_guardrail_blocks_total[1m]))",
+     "legendFormat": "{{guard}}",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    },
+    {
+     "expr": "sum by (kind) (increase(rahat_pii_redactions_total[1m]))",
+     "legendFormat": "pii {{kind}}",
+     "refId": "B",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 8,
+    "y": 20,
+    "w": 8,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 15,
+   "title": "Router: tier picks",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prom"
+   },
+   "targets": [
+    {
+     "expr": "sum by (context, tier) (increase(rahat_router_choice_total[1m]))",
+     "legendFormat": "{{context}} {{tier}}",
+     "refId": "A",
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prom"
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 16,
+    "y": 20,
+    "w": 8,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "lineWidth": 2,
+      "fillOpacity": 12
+     }
+    },
+    "overrides": []
+   },
+   "options": {}
+  }
+ ],
+ "tags": [
+  "rahat"
+ ]
+}

@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.venv/
+.ipynb_checkpoints/
+*.log
+# instructor-only material never lives in this repo
+deck/
+private/

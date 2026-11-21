@@ -1,0 +1,330 @@
+{
+ "_note": "Drill gazetteer. Coordinates are approximate town centres for an exercise, not survey data.",
+ "places": [
+  {
+   "name": "Pathankot",
+   "district": "Pathankot",
+   "lat": 32.274,
+   "lon": 75.652,
+   "river": "Ravi",
+   "aliases": [
+    "pathankot",
+    "ਪਠਾਨਕੋਟ",
+    "पठानकोट"
+   ]
+  },
+  {
+   "name": "Dera Baba Nanak",
+   "district": "Gurdaspur",
+   "lat": 32.035,
+   "lon": 75.027,
+   "river": "Ravi",
+   "aliases": [
+    "dera baba nanak",
+    "dbn",
+    "dera",
+    "ਡੇਰਾ ਬਾਬਾ ਨਾਨਕ",
+    "डेरा बाबा नानक"
+   ]
+  },
+  {
+   "name": "Gurdaspur",
+   "district": "Gurdaspur",
+   "lat": 32.041,
+   "lon": 75.405,
+   "river": "Ravi",
+   "aliases": [
+    "gurdaspur",
+    "gsp",
+    "ਗੁਰਦਾਸਪੁਰ",
+    "गुरदासपुर"
+   ]
+  },
+  {
+   "name": "Kalanaur",
+   "district": "Gurdaspur",
+   "lat": 32.017,
+   "lon": 75.157,
+   "river": "Ravi",
+   "aliases": [
+    "kalanaur",
+    "ਕਲਾਨੌਰ",
+    "कलानौर"
+   ]
+  },
+  {
+   "name": "Batala",
+   "district": "Gurdaspur",
+   "lat": 31.818,
+   "lon": 75.203,
+   "river": "Ravi",
+   "aliases": [
+    "batala",
+    "ਬਟਾਲਾ",
+    "बटाला"
+   ]
+  },
+  {
+   "name": "Ajnala",
+   "district": "Amritsar",
+   "lat": 31.843,
+   "lon": 74.762,
+   "river": "Ravi",
+   "aliases": [
+    "ajnala",
+    "ਅਜਨਾਲਾ",
+    "अजनाला"
+   ]
+  },
+  {
+   "name": "Ramdas",
+   "district": "Amritsar",
+   "lat": 31.966,
+   "lon": 74.906,
+   "river": "Ravi",
+   "aliases": [
+    "ramdas",
+    "ਰਮਦਾਸ",
+    "रमदास"
+   ]
+  },
+  {
+   "name": "Amritsar",
+   "district": "Amritsar",
+   "lat": 31.634,
+   "lon": 74.872,
+   "river": "Ravi",
+   "aliases": [
+    "amritsar",
+    "asr",
+    "ਅੰਮ੍ਰਿਤਸਰ",
+    "अमृतसर"
+   ]
+  },
+  {
+   "name": "Tarn Taran",
+   "district": "Tarn Taran",
+   "lat": 31.451,
+   "lon": 74.927,
+   "river": "Beas",
+   "aliases": [
+    "tarn taran",
+    "tarntaran",
+    "ਤਰਨ ਤਾਰਨ",
+    "तरन तारन"
+   ]
+  },
+  {
+   "name": "Harike",
+   "district": "Tarn Taran",
+   "lat": 31.165,
+   "lon": 74.947,
+   "river": "Sutlej",
+   "aliases": [
+    "harike",
+    "harike pattan",
+    "ਹਰੀਕੇ",
+    "हरिके"
+   ]
+  },
+  {
+   "name": "Sultanpur Lodhi",
+   "district": "Kapurthala",
+   "lat": 31.214,
+   "lon": 75.195,
+   "river": "Beas",
+   "aliases": [
+    "sultanpur lodhi",
+    "sultanpur",
+    "ਸੁਲਤਾਨਪੁਰ ਲੋਧੀ",
+    "सुल्तानपुर लोधी"
+   ]
+  },
+  {
+   "name": "Kapurthala",
+   "district": "Kapurthala",
+   "lat": 31.38,
+   "lon": 75.38,
+   "river": "Beas",
+   "aliases": [
+    "kapurthala",
+    "ਕਪੂਰਥਲਾ",
+    "कपूरथला"
+   ]
+  },
+  {
+   "name": "Beas",
+   "district": "Amritsar",
+   "lat": 31.517,
+   "lon": 75.288,
+   "river": "Beas",
+   "aliases": [
+    "beas town",
+    "beas",
+    "ਬਿਆਸ",
+    "ब्यास"
+   ]
+  },
+  {
+   "name": "Mukerian",
+   "district": "Hoshiarpur",
+   "lat": 31.953,
+   "lon": 75.616,
+   "river": "Beas",
+   "aliases": [
+    "mukerian",
+    "ਮੁਕੇਰੀਆਂ",
+    "मुकेरियां"
+   ]
+  },
+  {
+   "name": "Dasuya",
+   "district": "Hoshiarpur",
+   "lat": 31.817,
+   "lon": 75.653,
+   "river": "Beas",
+   "aliases": [
+    "dasuya",
+    "ਦਸੂਹਾ",
+    "दसूया"
+   ]
+  },
+  {
+   "name": "Tanda",
+   "district": "Hoshiarpur",
+   "lat": 31.668,
+   "lon": 75.636,
+   "river": "Beas",
+   "aliases": [
+    "tanda",
+    "tanda urmar",
+    "ਟਾਂਡਾ",
+    "टांडा"
+   ]
+  },
+  {
+   "name": "Talwara",
+   "district": "Hoshiarpur",
+   "lat": 31.94,
+   "lon": 75.88,
+   "river": "Beas",
+   "aliases": [
+    "talwara",
+    "pong",
+    "ਤਲਵਾੜਾ",
+    "तलवाड़ा"
+   ]
+  },
+  {
+   "name": "Shahkot",
+   "district": "Jalandhar",
+   "lat": 31.081,
+   "lon": 75.338,
+   "river": "Sutlej",
+   "aliases": [
+    "shahkot",
+    "ਸ਼ਾਹਕੋਟ",
+    "शाहकोट"
+   ]
+  },
+  {
+   "name": "Phillaur",
+   "district": "Jalandhar",
+   "lat": 31.019,
+   "lon": 75.79,
+   "river": "Sutlej",
+   "aliases": [
+    "phillaur",
+    "ਫਿਲੌਰ",
+    "फिल्लौर"
+   ]
+  },
+  {
+   "name": "Nawanshahr",
+   "district": "SBS Nagar",
+   "lat": 31.125,
+   "lon": 76.116,
+   "river": "Sutlej",
+   "aliases": [
+    "nawanshahr",
+    "ਨਵਾਂਸ਼ਹਿਰ",
+    "नवांशहर"
+   ]
+  },
+  {
+   "name": "Rupnagar",
+   "district": "Rupnagar",
+   "lat": 30.966,
+   "lon": 76.533,
+   "river": "Sutlej",
+   "aliases": [
+    "rupnagar",
+    "ropar",
+    "ਰੂਪਨਗਰ",
+    "रोपड़"
+   ]
+  },
+  {
+   "name": "Nangal",
+   "district": "Rupnagar",
+   "lat": 31.385,
+   "lon": 76.375,
+   "river": "Sutlej",
+   "aliases": [
+    "nangal",
+    "bhakra",
+    "ਨੰਗਲ",
+    "नंगल"
+   ]
+  },
+  {
+   "name": "Ferozepur",
+   "district": "Ferozepur",
+   "lat": 30.925,
+   "lon": 74.613,
+   "river": "Sutlej",
+   "aliases": [
+    "ferozepur",
+    "firozpur",
+    "ਫਿਰੋਜ਼ਪੁਰ",
+    "फिरोजपुर"
+   ]
+  },
+  {
+   "name": "Hussainiwala",
+   "district": "Ferozepur",
+   "lat": 30.99,
+   "lon": 74.55,
+   "river": "Sutlej",
+   "aliases": [
+    "hussainiwala",
+    "ਹੁਸੈਨੀਵਾਲਾ",
+    "हुसैनीवाला"
+   ]
+  },
+  {
+   "name": "Jalalabad",
+   "district": "Fazilka",
+   "lat": 30.606,
+   "lon": 74.257,
+   "river": "Sutlej",
+   "aliases": [
+    "jalalabad",
+    "ਜਲਾਲਾਬਾਦ",
+    "जलालाबाद"
+   ]
+  },
+  {
+   "name": "Fazilka",
+   "district": "Fazilka",
+   "lat": 30.403,
+   "lon": 74.028,
+   "river": "Sutlej",
+   "aliases": [
+    "fazilka",
+    "ਫਾਜ਼ਿਲਕਾ",
+    "फाजिल्का"
+   ]
+  }
+ ]
+}

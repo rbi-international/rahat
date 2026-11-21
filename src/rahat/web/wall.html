@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAHAT · Control room wall</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="/static/wall.css">
+</head>
+<body class="wall">
+<header class="wall-top">
+  <div class="title">
+    <div class="name">RAHAT</div>
+    <div class="ex">Exercise JALPRALAY &nbsp; Gurdaspur, Amritsar, Kapurthala, Ferozepur</div>
+  </div>
+  <div class="clock num" id="clock">00:00</div>
+  <dl class="counters">
+    <div><dt>SOS received</dt><dd class="num" id="c-recv">0</dd></div>
+    <div><dt>P1 waiting</dt><dd class="num p1" id="c-p1">0</dd></div>
+    <div><dt>Units dispatched</dt><dd class="num" id="c-disp">0</dd></div>
+    <div><dt>Attacks blocked</dt><dd class="num" id="c-block">0</dd></div>
+    <div><dt>Median to plan</dt><dd class="num" id="c-lat">–</dd></div>
+  </dl>
+</header>
+
+<main class="wall-grid">
+  <section class="map-wrap">
+    <div id="map"></div>
+    <div class="legend">
+      <span><i class="dot P1"></i>P1 life threatening</span>
+      <span><i class="dot P2"></i>P2 serious</span>
+      <span><i class="dot P3"></i>P3 needs help</span>
+      <span><i class="dot P4"></i>P4 information</span>
+      <span><i class="sq"></i>Rescue unit</span>
+    </div>
+    <div class="gauges" id="gauges"></div>
+  </section>
+
+  <aside class="side">
+    <section class="alloc">
+      <div class="label">Neerdhara Systems allocation remaining</div>
+      <div class="big num" id="alloc">1,500,000</div>
+      <div class="bar"><i id="allocbar"></i></div>
+      <div class="sub num" id="allocsub">0 tokens used in 0 model calls</div>
+    </section>
+    <section class="stream">
+      <div class="label">Agents at work <span class="num" id="qd"></span></div>
+      <ol id="stream"></ol>
+    </section>
+  </aside>
+</main>
+
+<footer class="ticker" id="ticker"><div class="track" id="track">EXERCISE &nbsp; ABHYAS &nbsp; Control room standing by.</div></footer>
+
+<div class="findings hide" id="findings" role="dialog" aria-label="Exercise findings">
+  <div class="inner">
+    <div class="label">Exercise terminated. What this room just did.</div>
+    <div class="fgrid" id="fgrid"></div>
+    <div class="miss" id="miss"></div>
+  </div>
+</div>
+
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script src="/static/wall.js"></script>
+</body>
+</html>

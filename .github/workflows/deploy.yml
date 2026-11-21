@@ -1,0 +1,59 @@
+name: deploy
+
+# Ships a tagged release to Azure Container Apps.
+#   git tag v1.0.0 && git push origin v1.0.0
+# Auth is OpenID Connect: GitHub proves who it is to Azure, so no Azure password
+# or key is stored in this repository. Set these repository variables:
+#   AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID, AZURE_RG, AZURE_ACR, AZURE_APP
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build in Azure Container Registry
+        run: |
+          az acr build --registry "${{ vars.AZURE_ACR }}" \
+            --image "rahat:${{ github.ref_name }}" --image "rahat:latest" .
+
+      - name: Roll out the new revision
+        run: |
+          az containerapp update \
+            --name "${{ vars.AZURE_APP }}" --resource-group "${{ vars.AZURE_RG }}" \
+            --image "${{ vars.AZURE_ACR }}.azurecr.io/rahat:${{ github.ref_name }}" \
+            --revision-suffix "${GITHUB_REF_NAME//./-}"
+
+      - name: Verify the live revision
+        run: |
+          FQDN=$(az containerapp show -n "${{ vars.AZURE_APP }}" -g "${{ vars.AZURE_RG }}" \
+            --query properties.configuration.ingress.fqdn -o tsv)
+          for i in $(seq 1 30); do
+            curl -fs "https://$FQDN/healthz" | grep -q '"ok":true' && echo "live: $GITHUB_REF_NAME" && exit 0
+            sleep 5
+          done
+          echo "new revision did not become healthy"; exit 1
