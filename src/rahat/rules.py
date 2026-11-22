@@ -77,7 +77,8 @@ _WATER = [
 _VULN = [
     ("infant", r"infant|baby|newborn|navjaat|nanha|ਨਵਜੰਮ|ਬੇਬੀ|नवजात|शिशु"),
     ("pregnant", r"pregnan|garbh|delivery|labou?r pain|ਗਰਭ|गर्भ"),
-    ("injured", r"injur|bleed|khoon|fractur|chot|wound|snake|saanp|sap ne|ਸੱਟ|ਖੂਨ|ਸੱਪ|चोट|खून|सांप"),
+    ("injured", r"injur|bleed|khoon|fractur|chot|wound|snake|saanp|sap ne|tut gayi|toot gayi|haddi|\bbaah\b|\blatt\b"
+                r"|ਸੱਟ|ਖੂਨ|ਸੱਪ|चोट|खून|सांप"),
     ("disabled", r"wheelchair|disab|apahij|can.?t walk|chal nahi|chal nhi|paralys|ਤੁਰ ਨਹੀਂ|चल नहीं"),
     ("elderly", r"elder|old (man|woman|lady)|buzurg|bebe|bapu|dadi|dada|nani|nana|grand(mother|father|ma|pa)|ਬਜ਼ੁਰਗ|ਬੇਬੇ|बुजुर्ग|दादी"),
     ("child", r"child|kid|bacch|bachch|bache|munda|kudi|ਬੱਚ|बच्च"),

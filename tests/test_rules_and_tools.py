@@ -23,6 +23,14 @@ def test_extraction_reads_hinglish():
     assert e.language == "hinglish"
 
 
+def test_rules_read_punjabi_injury_and_elder_words():
+    e = rules.extract("bebe di baah tut gayi, chhat te aa gaye, Batala")
+    assert "elderly" in e.vulnerable and "injured" in e.vulnerable
+    assert "injured" in rules.extract("latt toot gayi, haddi dikh rahi").vulnerable
+    # vocabulary, not substrings: "baahar" (outside) is not an injury
+    assert "injured" not in rules.extract("sab baahar aa gaye, Ajnala").vulnerable
+
+
 def test_geo_resolves_aliases_in_three_scripts():
     assert geo.locate("near gurudwara, dera baba nanak").village == "Dera Baba Nanak"
     assert geo.locate("ਪਾਣੀ ਬਟਾਲਾ ਵਿੱਚ").village == "Batala"
