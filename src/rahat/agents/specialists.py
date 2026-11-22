@@ -18,6 +18,46 @@ from ..models import Assignment, Extraction, Location, Plan, Priority, Triage
 from . import prompts
 
 _VULN_OK = {"infant", "child", "elderly", "pregnant", "disabled", "injured"}
+_LANG_OK = {"pa", "hi", "hinglish", "en"}
+
+
+def _one_need(value):
+    """Models sometimes return need as a list. The most serious single need wins."""
+    if not isinstance(value, list):
+        return value
+    items = [str(v).strip().lower() for v in value if str(v).strip()]
+    if not items:
+        return "rescue"
+    for wanted in ("medical", "rescue"):
+        if wanted in items:
+            return wanted
+    return items[0]
+
+
+def _language_code(value):
+    """Map labels like "Punjabi (romanized)" or "Hindi-English mix" to pa, hi, hinglish or en."""
+    s = str(value).strip().lower()
+    if s in _LANG_OK:
+        return s
+    if "hinglish" in s or ("hindi" in s and "english" in s):
+        return "hinglish"
+    if "punjabi" in s or "panjabi" in s or "gurmukhi" in s:
+        return "pa"
+    if "hindi" in s:
+        return "hi"
+    if "english" in s:
+        return "en"
+    return value
+
+
+def _normalise_intake(data: dict) -> dict:
+    data = dict(data)
+    if "need" in data:
+        data["need"] = _one_need(data["need"])
+    if "language" in data:
+        data["language"] = _language_code(data["language"])
+    data["vulnerable"] = [v for v in data.get("vulnerable", []) if v in _VULN_OK]
+    return data
 
 
 async def intake(clean_text: str) -> tuple[Extraction, LLMResult]:
@@ -28,9 +68,7 @@ async def intake(clean_text: str) -> tuple[Extraction, LLMResult]:
         "intake", prompts.INTAKE, f"MESSAGE:\n{clean_text}", fallback, tier="fast", max_tokens=400
     )
     try:
-        data = dict(res.data)
-        data["vulnerable"] = [v for v in data.get("vulnerable", []) if v in _VULN_OK]
-        ext = Extraction.model_validate(data)
+        ext = Extraction.model_validate(_normalise_intake(res.data))
     except ValidationError:
         ext = rules.extract(clean_text)
         res.degraded = True
