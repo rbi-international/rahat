@@ -110,11 +110,15 @@ APP_ID=$(az ad app list --display-name "rahat-github-deploy" --query "[0].appId"
 [ -n "$APP_ID" ] || APP_ID=$(az ad app create --display-name "rahat-github-deploy" \
   --sign-in-audience AzureADMyOrg --query appId -o tsv)
 az ad sp create --id "$APP_ID" -o none 2>/dev/null || true
+# GitHub now puts owner and repo IDs in the OIDC subject: repo:OWNER@ID/REPO@ID:environment:production.
+# The old name-only form fails with AADSTS700213. Read the IDs from the GitHub API.
+OWNER_ID=$(gh api "repos/$GITHUB_REPO" --jq .owner.id); REPO_ID=$(gh api "repos/$GITHUB_REPO" --jq .id)
+GITHUB_OIDC_SUBJECT="repo:${GITHUB_REPO%%/*}@$OWNER_ID/${GITHUB_REPO#*/}@$REPO_ID:environment:production"
 SP_ID=$(az ad sp show --id "$APP_ID" --query id -o tsv)
 az ad app federated-credential create --id "$APP_ID" --parameters "{
   \"name\": \"github-production\",
   \"issuer\": \"https://token.actions.githubusercontent.com\",
-  \"subject\": \"repo:$GITHUB_REPO:environment:production\",
+  \"subject\": \"$GITHUB_OIDC_SUBJECT\",
   \"audiences\": [\"api://AzureADTokenExchange\"]}" -o none 2>/dev/null || true
 az role assignment create --assignee-object-id "$SP_ID" --assignee-principal-type ServicePrincipal \
   --role Contributor --scope "$(az containerapp show -n "$APP" -g "$RG" --query id -o tsv)" -o none
