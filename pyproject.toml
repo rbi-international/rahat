@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rahat"
-version = "1.0.1"
+version = "1.0.2"
 description = "RAHAT: Real-time Agentic Help And Triage. A multi-agent flood response command center on Microsoft Foundry."
 readme = "README.md"
 requires-python = ">=3.11"
