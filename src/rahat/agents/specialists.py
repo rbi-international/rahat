@@ -12,7 +12,7 @@ import re
 
 from pydantic import ValidationError
 
-from .. import rules
+from .. import metrics, rules
 from ..guardrails.policy import bound_priority, clean_reply
 from ..llm import LLMResult, complete_json
 from ..models import Assignment, Extraction, Location, Plan, Priority, Triage
@@ -145,6 +145,60 @@ def ask_location_reply(language: str) -> str:
     return ASK_LOCATION.get(language, ASK_LOCATION["en"])
 
 
+QUEUED_REPLY = {
+    "pa": "ਤੁਹਾਡਾ ਸੁਨੇਹਾ ਮਿਲ ਗਿਆ ਹੈ। ਨੇੜੇ ਕੋਈ ਯੂਨਿਟ ਖਾਲੀ ਨਹੀਂ, ਤੁਸੀਂ ਅਗਲੀ ਖਾਲੀ ਯੂਨਿਟ ਦੀ ਕਤਾਰ ਵਿੱਚ ਹੋ। ਸਭ ਤੋਂ ਉੱਚੀ ਥਾਂ 'ਤੇ ਰਹੋ, "
+          "ਸਾਰੇ ਇਕੱਠੇ ਰਹੋ।",
+    "hi": "आपका संदेश मिल गया है। पास में कोई यूनिट खाली नहीं है, आप अगली खाली यूनिट की कतार में हैं। सबसे ऊंची जगह पर रहें, "
+          "सब साथ रहें।",
+    "hinglish": "Aapka message mil gaya hai. Paas mein koi unit khaali nahi hai, aap agli khaali unit ki line mein hain. "
+                "Sabse oonchi jagah par rahein, sab saath rahein.",
+    "en": "Your message is received. No rescue unit is free nearby yet; you are queued for the next free one. "
+          "Move to the highest point and keep everyone together.",
+}
+
+# Asset kinds as the model may write them, in English, Hinglish, Hindi and Punjabi.
+_ASSET_KINDS = {
+    "boat": r"boats?|kisht[iy]\w*|naav|nauka|नाव|नौका|ਕਿਸ਼ਤੀ|ਬੇੜੀ|\bB-\d+",
+    "medical": r"medical unit|ambulance|medic\b|एम्बुलेंस|ਐਂਬੂਲੈਂਸ|\bM-\d+",
+    "ndrf": r"ndrf|sdrf|एनडीआरएफ|ਐਨਡੀਆਰਐਫ",
+    "air": r"helicopters?|heli\b|chopper|air ?lift|airborne|हेलीकॉप्टर|ਹੈਲੀਕਾਪਟਰ",
+}
+_ASSET_RE = {k: re.compile(p, re.I) for k, p in _ASSET_KINDS.items()}
+_ASSET_ID = re.compile(r"\b([BM])-(\d+)\b")
+# A time the text promises: "ETA 30", "30-60 min", "1-3 hours", "20 मिनट", "ਲਗਭਗ 15 ਮਿੰਟ".
+_TIME_RE = re.compile(
+    r"(?:eta\s*[:~]?\s*(?:approx\.?\s*|about\s*|~\s*)?(\d+)(?:\s*[-–]\s*(\d+))?)"
+    r"|(?:(\d+)(?:\s*(?:[-–]|to)\s*(\d+))?\s*(min\w*|mins?\b|minute\w*|hours?|hrs?\b|ghante|ghanta|मिनट|घंटे|घंटा|ਮਿੰਟ|ਘੰਟੇ|ਘੰਟਾ))",
+    re.I,
+)
+
+
+def _times(text: str) -> list[int]:
+    """Every promised time in the text, in minutes."""
+    out = []
+    for m in _TIME_RE.finditer(text):
+        unit = (m.group(5) or "min").lower()
+        scale = 60 if unit.startswith(("hour", "hr", "ghant", "घंट", "ਘੰਟ")) else 1
+        for g in (m.group(1), m.group(2), m.group(3), m.group(4)):
+            if g:
+                out.append(int(g) * scale)
+    return out
+
+
+def names_unassigned(text: str, asg: Assignment) -> bool:
+    """True if the text names an asset or a time the allocator did not assign."""
+    kinds = {k for k, r in _ASSET_RE.items() if r.search(text)}
+    if not asg.asset_id:
+        return bool(kinds) or bool(_times(text))
+    if kinds - {asg.asset_kind}:
+        return True
+    mine = _ASSET_ID.search(asg.asset_label or "")
+    for m in _ASSET_ID.finditer(text):
+        if not mine or m.group(0) != mine.group(0):
+            return True
+    return any(t != asg.eta_min for t in _times(text))
+
+
 async def commander(
     ext: Extraction, loc: Location, tri: Triage, asg: Assignment
 ) -> tuple[Plan, LLMResult]:
@@ -163,16 +217,16 @@ async def commander(
                 "officer_brief": f"Information request near {loc.village or 'unknown place'}, guidance sent.",
                 "citizen_reply": f"Nearest open point: {camp}. If water rises, move to high ground and send a new SOS. Helpline 1070.",
             }
-        brief = (
-            f"{tri.priority.value}: {ext.people_count} people, water {ext.water_level}, "
-            f"{loc.village or 'location unclear'}. {asg.asset_label or 'No unit free'}, ETA {asg.eta_min or '?'} min."
-        )
+        head = f"{tri.priority.value}: {ext.people_count} people, water {ext.water_level}, {loc.village or 'location unclear'}."
+        if not asg.asset_id:
+            return {"officer_brief": f"{head} No free unit nearby, queued for the next free unit.",
+                    "citizen_reply": QUEUED_REPLY.get(ext.language, QUEUED_REPLY["en"])}
         reply = {
-            "pa": f"ਤੁਹਾਡਾ ਸੁਨੇਹਾ ਮਿਲ ਗਿਆ ਹੈ। ਮਦਦ ਭੇਜੀ ਜਾ ਰਹੀ ਹੈ, ਲਗਭਗ {asg.eta_min or '?'} ਮਿੰਟ। ਸਭ ਤੋਂ ਉੱਚੀ ਥਾਂ 'ਤੇ ਰਹੋ।",
-            "hi": f"आपका संदेश मिल गया है। मदद भेजी जा रही है, लगभग {asg.eta_min or '?'} मिनट। सबसे ऊंची जगह पर रहें।",
+            "pa": f"ਤੁਹਾਡਾ ਸੁਨੇਹਾ ਮਿਲ ਗਿਆ ਹੈ। ਮਦਦ ਭੇਜੀ ਜਾ ਰਹੀ ਹੈ, ਲਗਭਗ {asg.eta_min} ਮਿੰਟ। ਸਭ ਤੋਂ ਉੱਚੀ ਥਾਂ 'ਤੇ ਰਹੋ।",
+            "hi": f"आपका संदेश मिल गया है। मदद भेजी जा रही है, लगभग {asg.eta_min} मिनट। सबसे ऊंची जगह पर रहें।",
             "hinglish": f"Aapka message mil gaya hai. Madad aa rahi hai, {eta}. Sabse oonchi jagah par rahein, bacchon ko paas rakhein.",
         }.get(ext.language, f"Your message is received. Help is being arranged, {eta}. Move to the highest point and keep everyone together.")
-        return {"officer_brief": brief, "citizen_reply": reply}
+        return {"officer_brief": f"{head} {asg.asset_label}, ETA {asg.eta_min} min.", "citizen_reply": reply}
 
     payload = {
         "priority": tri.priority.value,
@@ -202,6 +256,15 @@ async def commander(
     if not loc.resolved and not _ASKS_PLACE.search(plan.citizen_reply):
         # The model forgot to ask where they are. Asking back is exact work: code guarantees it.
         plan.citizen_reply = ask_location_reply(ext.language)
+    # Assets and ETAs are exact work: the allocator decides them, the model only words them.
+    # Any asset or time the allocator did not assign is replaced with the code-built text.
+    exact = fallback()
+    if names_unassigned(plan.officer_brief, asg):
+        plan.officer_brief = exact["officer_brief"]
+        metrics.GUARD_BLOCKS.labels("commander_unassigned").inc()
+    if names_unassigned(plan.citizen_reply, asg):
+        plan.citizen_reply = exact["citizen_reply"]
+        metrics.GUARD_BLOCKS.labels("commander_unassigned").inc()
     plan.officer_brief = clean_reply(plan.officer_brief, 240)
     plan.citizen_reply = clean_reply(plan.citizen_reply, 320)
     return plan, res
