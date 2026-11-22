@@ -14,8 +14,8 @@ const RIVERS = {
 const WIDTH = {normal: 4, warning: 10, danger: 20, extreme: 32};
 
 const map = L.map("map", {zoomControl: false, attributionControl: true}).setView([31.55, 75.25], 9);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-  attribution: "© OpenStreetMap, © CARTO", subdomains: "abcd", maxZoom: 13,
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap contributors", maxZoom: 13,
 }).addTo(map);
 
 const riverLayers = {};

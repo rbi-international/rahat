@@ -80,6 +80,8 @@ body.wall {
 .miss { margin-top: 36px; color: #c7d4da; font-size: 17px; border-top: 1px solid var(--wall-line); padding-top: 18px; }
 
 .leaflet-container { font-family: var(--font); }
+/* OSM tiles are light; invert only the tile pane so rivers, pins and units keep their colours. */
+.leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9); }
 .unit-icon { width: 10px; height: 10px; background: #e7eef1; border: 1px solid #0f1d25; }
 .unit-icon.held { background: #f0b35e; }
 .unit-icon.dispatched { background: #7fd6a8; }
