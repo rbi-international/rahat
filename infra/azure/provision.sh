@@ -10,6 +10,11 @@ source "$HERE/config.sh"
 
 step() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
+step "0. Resource providers (a new subscription has not registered these yet)"
+for ns in Microsoft.CognitiveServices Microsoft.ContainerRegistry Microsoft.App Microsoft.OperationalInsights; do
+  az provider register -n "$ns" --wait -o none
+done
+
 step "1. Resource group $RG in $LOC"
 az group create -n "$RG" -l "$LOC" -o none
 
@@ -41,12 +46,20 @@ CS_ENDPOINT=$(az cognitiveservices account show -n "$CS" -g "$RG" --query proper
 CS_KEY=$(az cognitiveservices account keys list -n "$CS" -g "$RG" --query key1 -o tsv)
 
 step "5. Log Analytics and Application Insights (tracing)"
-az monitor log-analytics workspace create -g "$RG" -n "$LAW" -l "$LOC" -o none
+if az monitor log-analytics workspace show -g "$RG" -n "$LAW" -o none 2>/dev/null; then
+  echo "  $LAW already exists, reusing"
+else
+  az monitor log-analytics workspace create -g "$RG" -n "$LAW" -l "$LOC" -o none
+fi
 LAW_ID=$(az monitor log-analytics workspace show -g "$RG" -n "$LAW" --query customerId -o tsv)
 LAW_KEY=$(az monitor log-analytics workspace get-shared-keys -g "$RG" -n "$LAW" --query primarySharedKey -o tsv)
 az extension add --name application-insights --upgrade -o none 2>/dev/null || true
-az monitor app-insights component create --app "$APPI" -g "$RG" -l "$LOC" --kind web \
-  --workspace "$(az monitor log-analytics workspace show -g "$RG" -n "$LAW" --query id -o tsv)" -o none
+if az monitor app-insights component show --app "$APPI" -g "$RG" -o none 2>/dev/null; then
+  echo "  $APPI already exists, reusing"
+else
+  az monitor app-insights component create --app "$APPI" -g "$RG" -l "$LOC" --kind web \
+    --workspace "$(az monitor log-analytics workspace show -g "$RG" -n "$LAW" --query id -o tsv)" -o none
+fi
 APPI_CONN=$(az monitor app-insights component show --app "$APPI" -g "$RG" --query connectionString -o tsv)
 
 step "6. Container registry $ACR"
@@ -63,7 +76,8 @@ ADMIN_TOKEN=${ADMIN_TOKEN:-$(openssl rand -hex 24)}
 METRICS_TOKEN=${METRICS_TOKEN:-$(openssl rand -hex 24)}
 az containerapp create -n "$APP" -g "$RG" --environment "$ENV_NAME" \
   --image mcr.microsoft.com/k8se/quickstart:latest --target-port 80 --ingress external \
-  --min-replicas 0 --max-replicas 1 --cpu 1.0 --memory 2.0Gi --system-assigned -o none
+  --min-replicas 1 --max-replicas 1 --cpu 1.0 --memory 2.0Gi --system-assigned -o none
+# The identity exists only now: grant its roles, then pull from ACR with it (no admin user, no password).
 PRINCIPAL=$(az containerapp show -n "$APP" -g "$RG" --query identity.principalId -o tsv)
 az role assignment create --assignee-object-id "$PRINCIPAL" --assignee-principal-type ServicePrincipal \
   --role "Cognitive Services OpenAI User" --scope "$AI_ID" -o none
@@ -77,6 +91,9 @@ az acr build -r "$ACR" -t rahat:bootstrap "$HERE/../.." -o none
 az containerapp secret set -n "$APP" -g "$RG" --secrets \
   admin-token="$ADMIN_TOKEN" metrics-token="$METRICS_TOKEN" cs-key="$CS_KEY" appi="$APPI_CONN" -o none
 FQDN=$(az containerapp show -n "$APP" -g "$RG" --query properties.configuration.ingress.fqdn -o tsv)
+# Port first, so the new revision is probed on the port uvicorn listens on (Dockerfile: 8000).
+az containerapp ingress update -n "$APP" -g "$RG" --target-port 8000 -o none
+# If this pull fails right after the role assignment, wait two minutes for AcrPull to apply and run it once more.
 az containerapp update -n "$APP" -g "$RG" --image "$ACR.azurecr.io/rahat:bootstrap" \
   --set-env-vars PROVIDER=foundry AZURE_USE_MANAGED_IDENTITY=1 AZURE_OPENAI_ENDPOINT="$AI_ENDPOINT" \
     MODEL_FAST=rahat-fast MODEL_STRONG=rahat-strong REASONING_FAST="$REASONING_FAST" REASONING_STRONG="$REASONING_STRONG" \
@@ -85,7 +102,6 @@ az containerapp update -n "$APP" -g "$RG" --image "$ACR.azurecr.io/rahat:bootstr
     CONTENT_SAFETY_ENDPOINT="$CS_ENDPOINT" CONTENT_SAFETY_KEY=secretref:cs-key \
     APPLICATIONINSIGHTS_CONNECTION_STRING=secretref:appi \
     ADMIN_TOKEN=secretref:admin-token METRICS_TOKEN=secretref:metrics-token -o none
-az containerapp ingress update -n "$APP" -g "$RG" --target-port 8000 -o none
 
 step "10. GitHub Actions identity (OpenID Connect, no stored password)"
 APP_ID=$(az ad app create --display-name "rahat-github-deploy" --query appId -o tsv)
