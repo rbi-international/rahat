@@ -61,8 +61,25 @@ async def lifespan(app: FastAPI):
     await pipeline.stop()
 
 
+# App assets revalidate on every load (ETag, so an unchanged file is a 304) and a new deploy shows at once.
+# Only the vendored libraries, which never change, may sit in the browser cache.
+REVALIDATE = "no-cache"
+VENDOR_CACHE = "public, max-age=31536000"
+
+
+class AppStatic(StaticFiles):
+    def file_response(self, full_path, stat_result, scope, status_code=200):
+        resp = super().file_response(full_path, stat_result, scope, status_code)
+        rel = scope["path"].replace("\\", "/")
+        if "/vendor/" in rel or rel.startswith("vendor/"):
+            resp.headers["Cache-Control"] = VENDOR_CACHE
+        elif rel.endswith((".js", ".css", ".html")):
+            resp.headers["Cache-Control"] = REVALIDATE
+        return resp
+
+
 app = FastAPI(title="RAHAT", version=__version__, lifespan=lifespan, docs_url="/api/docs", redoc_url=None)
-app.mount("/static", StaticFiles(directory=str(WEB)), name="static")
+app.mount("/static", AppStatic(directory=str(WEB)), name="static")
 
 
 @app.middleware("http")
@@ -104,7 +121,7 @@ def _secure(request: Request) -> bool:
 
 
 def _page(name: str) -> HTMLResponse:
-    return HTMLResponse(WEB.joinpath(name).read_text(encoding="utf-8"))
+    return HTMLResponse(WEB.joinpath(name).read_text(encoding="utf-8"), headers={"Cache-Control": REVALIDATE})
 
 
 # ------------------------------------------------------------------ pages
