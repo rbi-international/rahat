@@ -104,7 +104,11 @@ az containerapp update -n "$APP" -g "$RG" --image "$ACR.azurecr.io/rahat:bootstr
     ADMIN_TOKEN=secretref:admin-token METRICS_TOKEN=secretref:metrics-token -o none
 
 step "10. GitHub Actions identity (OpenID Connect, no stored password)"
-APP_ID=$(az ad app create --display-name "rahat-github-deploy" --query appId -o tsv)
+# Least privilege: AcrPush on the registry and Contributor on this one app. Nothing at RG
+# or subscription scope. AcrPush cannot run ACR Tasks, so deploy.yml builds on the runner.
+APP_ID=$(az ad app list --display-name "rahat-github-deploy" --query "[0].appId" -o tsv)
+[ -n "$APP_ID" ] || APP_ID=$(az ad app create --display-name "rahat-github-deploy" \
+  --sign-in-audience AzureADMyOrg --query appId -o tsv)
 az ad sp create --id "$APP_ID" -o none 2>/dev/null || true
 SP_ID=$(az ad sp show --id "$APP_ID" --query id -o tsv)
 az ad app federated-credential create --id "$APP_ID" --parameters "{
@@ -113,7 +117,7 @@ az ad app federated-credential create --id "$APP_ID" --parameters "{
   \"subject\": \"repo:$GITHUB_REPO:environment:production\",
   \"audiences\": [\"api://AzureADTokenExchange\"]}" -o none 2>/dev/null || true
 az role assignment create --assignee-object-id "$SP_ID" --assignee-principal-type ServicePrincipal \
-  --role Contributor --scope "$(az group show -n "$RG" --query id -o tsv)" -o none
+  --role Contributor --scope "$(az containerapp show -n "$APP" -g "$RG" --query id -o tsv)" -o none
 az role assignment create --assignee-object-id "$SP_ID" --assignee-principal-type ServicePrincipal \
   --role AcrPush --scope "$ACR_ID" -o none
 
@@ -130,5 +134,6 @@ GitHub repository variables (Settings > Secrets and variables > Actions > Variab
   AZURE_TENANT_ID=$(az account show --query tenantId -o tsv)
   AZURE_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
   AZURE_RG=$RG  AZURE_ACR=$ACR  AZURE_APP=$APP
-And create a GitHub environment named "production".
+And create a GitHub environment named "production" (the federated credential trusts only it).
+Required reviewers on it need a public repo or a paid GitHub plan.
 OUT

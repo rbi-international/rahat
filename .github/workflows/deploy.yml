@@ -5,6 +5,11 @@ name: deploy
 # Auth is OpenID Connect: GitHub proves who it is to Azure, so no Azure password
 # or key is stored in this repository. Set these repository variables:
 #   AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID, AZURE_RG, AZURE_ACR, AZURE_APP
+#
+# The deploy identity holds only AcrPush on the registry and Contributor on the one
+# container app. AcrPush cannot run ACR Tasks, so the image is built on the runner
+# and pushed with a registry token exchanged from the OIDC login.
+# The app URL is read at runtime and masked before use; no step prints it.
 
 on:
   push:
@@ -27,6 +32,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     environment: production
+    env:
+      REGISTRY: ${{ vars.AZURE_ACR }}.azurecr.io
+      IMAGE: ${{ vars.AZURE_ACR }}.azurecr.io/rahat:${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v7
 
@@ -36,24 +44,45 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build in Azure Container Registry
+      - name: Log in to the registry (data plane, AcrPush)
         run: |
-          az acr build --registry "${{ vars.AZURE_ACR }}" \
-            --image "rahat:${{ github.ref_name }}" --image "rahat:latest" .
+          AAD=$(az account get-access-token --query accessToken -o tsv)
+          echo "::add-mask::$AAD"
+          ACR_TOKEN=$(curl -fsS -X POST "https://$REGISTRY/oauth2/exchange" \
+            --data-urlencode grant_type=access_token --data-urlencode "service=$REGISTRY" \
+            --data-urlencode "tenant=${{ vars.AZURE_TENANT_ID }}" --data-urlencode "access_token=$AAD" \
+            | jq -r .refresh_token)
+          echo "::add-mask::$ACR_TOKEN"
+          echo "$ACR_TOKEN" | docker login "$REGISTRY" -u 00000000-0000-0000-0000-000000000000 --password-stdin
+
+      - name: Build and push the image
+        run: |
+          docker build -t "$IMAGE" -t "$REGISTRY/rahat:latest" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" .
+          docker push "$IMAGE"
+          docker push "$REGISTRY/rahat:latest"
+          echo "pushed rahat:$GITHUB_REF_NAME"
 
       - name: Roll out the new revision
         run: |
+          az extension add --name containerapp --upgrade -y -o none
           az containerapp update \
             --name "${{ vars.AZURE_APP }}" --resource-group "${{ vars.AZURE_RG }}" \
-            --image "${{ vars.AZURE_ACR }}.azurecr.io/rahat:${{ github.ref_name }}" \
-            --revision-suffix "${GITHUB_REF_NAME//./-}"
+            --image "$IMAGE" --revision-suffix "${GITHUB_REF_NAME//./-}" -o none
+          az containerapp show -n "${{ vars.AZURE_APP }}" -g "${{ vars.AZURE_RG }}" \
+            --query "{revision:properties.latestRevisionName,image:properties.template.containers[0].image}" -o tsv
 
-      - name: Verify the live revision
+      - name: Verify the live revision (status codes only)
         run: |
           FQDN=$(az containerapp show -n "${{ vars.AZURE_APP }}" -g "${{ vars.AZURE_RG }}" \
             --query properties.configuration.ingress.fqdn -o tsv)
+          echo "::add-mask::$FQDN"
+          echo "::add-mask::https://$FQDN"
           for i in $(seq 1 30); do
-            curl -fs "https://$FQDN/healthz" | grep -q '"ok":true' && echo "live: $GITHUB_REF_NAME" && exit 0
+            h=$(curl -s -o /dev/null -w '%{http_code}' "https://$FQDN/healthz" || true)
+            r=$(curl -s -o /dev/null -w '%{http_code}' "https://$FQDN/readyz" || true)
+            echo "try $i: healthz=$h readyz=$r"
+            [ "$h" = 200 ] && [ "$r" = 200 ] && exit 0
             sleep 5
           done
           echo "new revision did not become healthy"; exit 1
