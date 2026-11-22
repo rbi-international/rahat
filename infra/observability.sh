@@ -2,7 +2,7 @@
 # Point Prometheus at a RAHAT instance and start Prometheus + Grafana.
 # Usage: ./infra/observability.sh <host[:port]> <metrics-token>
 set -euo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE="$(cd "$(dirname "$0")" && (pwd -W 2>/dev/null || pwd))"  # pwd -W: a Windows path Docker Desktop understands
 TARGET="${1:?host of the RAHAT app, e.g. rahat.<region>.azurecontainerapps.io}"
 TOKEN="${2:-}"
 SCHEME=https
