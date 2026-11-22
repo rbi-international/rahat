@@ -86,7 +86,6 @@ def _inc(sos_id: str) -> Incident:
 
 # --------------------------------------------------------------------- nodes
 
-@executor(id="guard")
 async def guard(sos_id: str, ctx: WorkflowContext[Gate]) -> None:
     inc = _inc(sos_id)
     inc.status = Status.PROCESSING
@@ -112,7 +111,6 @@ async def guard(sos_id: str, ctx: WorkflowContext[Gate]) -> None:
     await ctx.send_message(Gate(sos_id, result.flagged))
 
 
-@executor(id="review_queue")
 async def review_queue(g: Gate, ctx: WorkflowContext) -> None:
     inc = _inc(g.sos_id)
     inc.status = Status.BLOCKED
@@ -121,7 +119,6 @@ async def review_queue(g: Gate, ctx: WorkflowContext) -> None:
     await ctx.yield_output(g.sos_id)
 
 
-@executor(id="intake")
 async def intake(g: Gate, ctx: WorkflowContext[str]) -> None:
     inc = _inc(g.sos_id)
     emit(g.sos_id, "intake", "reading", "loading multilingual extraction schema")
@@ -134,7 +131,6 @@ async def intake(g: Gate, ctx: WorkflowContext[str]) -> None:
     await ctx.send_message(g.sos_id)
 
 
-@executor(id="geo")
 async def geo_node(sos_id: str, ctx: WorkflowContext[str]) -> None:
     inc = _inc(sos_id)
     emit(sos_id, "geo", "tool call", "gazetteer.locate()")
@@ -165,7 +161,6 @@ def _location_follow_up(other_id: str, device: str, inc: Incident) -> bool:
     return bool(other and "asked_location" in other.flags)
 
 
-@executor(id="verifier")
 async def verifier(sos_id: str, ctx: WorkflowContext[str]) -> None:
     inc = _inc(sos_id)
     flags: list[str] = []
@@ -193,7 +188,6 @@ async def verifier(sos_id: str, ctx: WorkflowContext[str]) -> None:
     await ctx.send_message("verifier")
 
 
-@executor(id="triage")
 async def triage_node(done: list[str], ctx: WorkflowContext[Routed]) -> None:
     sos_id = ctx.get_state("sos_id")
     inc = _inc(sos_id)
@@ -213,7 +207,6 @@ async def triage_node(done: list[str], ctx: WorkflowContext[Routed]) -> None:
     await ctx.send_message(Routed(sos_id, ext.need))
 
 
-@executor(id="info_desk")
 async def info_desk(r: Routed, ctx: WorkflowContext) -> None:
     inc = _inc(r.sos_id)
     plan, res = await specialists.commander(inc.extraction, inc.location, inc.triage,
@@ -228,7 +221,6 @@ async def info_desk(r: Routed, ctx: WorkflowContext) -> None:
     await ctx.yield_output(r.sos_id)
 
 
-@executor(id="allocate")
 async def allocate(r: Routed, ctx: WorkflowContext[str]) -> None:
     inc = _inc(r.sos_id)
     emit(r.sos_id, "resource", "tool call", "registry.hold_nearest()")
@@ -242,7 +234,6 @@ async def allocate(r: Routed, ctx: WorkflowContext[str]) -> None:
     await ctx.send_message(r.sos_id)
 
 
-@executor(id="commander")
 async def commander(sos_id: str, ctx: WorkflowContext) -> None:
     inc = _inc(sos_id)
     plan, res = await specialists.commander(inc.extraction, inc.location, inc.triage, inc.assignment)
@@ -257,27 +248,36 @@ async def commander(sos_id: str, ctx: WorkflowContext) -> None:
     await ctx.yield_output(sos_id)
 
 
-@executor(id="start")
 async def start(sos_id: str, ctx: WorkflowContext[str]) -> None:
     ctx.set_state("sos_id", sos_id)
     await ctx.send_message(sos_id)
 
 
+NODES = {"start": start, "guard": guard, "review_queue": review_queue, "intake": intake, "geo": geo_node,
+         "verifier": verifier, "triage": triage_node, "info_desk": info_desk, "allocate": allocate,
+         "commander": commander}
+
+
 def build_workflow():
+    # Fresh executors for every SOS. Agent Framework runs each executor instance under its own lock,
+    # so module-level executors shared by all workflows would let one SOS at a time through each node,
+    # whatever WORKERS is set to.
+    n = {i: executor(id=i)(f) for i, f in NODES.items()}
     return (
-        WorkflowBuilder(start_executor=start)
-        .add_edge(start, guard)
+        WorkflowBuilder(start_executor=n["start"])
+        .add_edge(n["start"], n["guard"])
         .add_switch_case_edge_group(
-            guard,
-            [Case(condition=lambda g: g.blocked, target=review_queue), Default(target=intake)],
+            n["guard"],
+            [Case(condition=lambda g: g.blocked, target=n["review_queue"]), Default(target=n["intake"])],
         )
-        .add_fan_out_edges(intake, [geo_node, verifier])
-        .add_fan_in_edges([geo_node, verifier], triage_node)
+        .add_fan_out_edges(n["intake"], [n["geo"], n["verifier"]])
+        .add_fan_in_edges([n["geo"], n["verifier"]], n["triage"])
         .add_switch_case_edge_group(
-            triage_node,
-            [Case(condition=lambda r: r.need == "information", target=info_desk), Default(target=allocate)],
+            n["triage"],
+            [Case(condition=lambda r: r.need == "information", target=n["info_desk"]),
+             Default(target=n["allocate"])],
         )
-        .add_edge(allocate, commander)
+        .add_edge(n["allocate"], n["commander"])
         .build()
     )
 

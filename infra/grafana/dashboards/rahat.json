@@ -225,7 +225,7 @@
    },
    "targets": [
     {
-     "expr": "sum(rahat_circuit_open)",
+     "expr": "sum(rahat_circuit_open) or vector(0)",
      "legendFormat": "",
      "refId": "A",
      "datasource": {
