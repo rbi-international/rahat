@@ -38,7 +38,7 @@ from .guardrails.policy import audit
 from .lanes import get_lane
 from .llm import breaker, ledger
 from .models import SOS, Status
-from .pipeline import pipeline
+from .pipeline import pipeline, wall_stats
 from .router import router
 from .store import store
 from .telemetry import setup_telemetry
@@ -373,7 +373,7 @@ def state(role: str = Depends(need_officer)):
         "assets": registry.snapshot(),
         "camps": registry.camps,
         "gauges": gauges.state,
-        "stats": store.stats(),
+        "stats": wall_stats(),
         "router": router.snapshot(),
         "drill": {"started_at": drill.started_at, "ended_at": drill.ended_at,
                   "network_degraded": drill.network_degraded, "injects": drill.injects[-20:]},

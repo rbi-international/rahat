@@ -20,6 +20,8 @@ import time
 from . import metrics
 from .agents import specialists
 from .config import settings
+from .drill import scoring
+from .drill.control import drill
 from .events import bus
 from .guardrails.policy import audit
 from .llm import ledger
@@ -31,6 +33,13 @@ from .workflow import emit, registry, run_incident
 log = logging.getLogger("rahat.pipeline")
 
 TRIP_SECONDS_PER_ETA_MIN = 1.5  # drill time compression: a 10 minute ETA trip takes 30 s round trip
+
+
+def wall_stats() -> dict:
+    """Board counters for the wall. Attacks stopped uses the findings' own definition, so the two always agree."""
+    st = store.stats()
+    st["attacks_stopped"] = scoring.attacks_stopped(store.all(), drill.personas)
+    return st
 
 
 class Pipeline:
@@ -104,7 +113,7 @@ class Pipeline:
                 "queue": self.queue.qsize() if self.queue else 0,
                 "in_flight": self.in_flight,
                 "assets": registry.summary(),
-                "stats": store.stats(),
+                "stats": wall_stats(),
             })
             await asyncio.sleep(0.5)
 

@@ -78,6 +78,8 @@ async def intake(clean_text: str) -> tuple[Extraction, LLMResult]:
         ext.location_text = clean_text
     if ext.water_level == "unknown" and hint.water_level != "unknown":
         ext.water_level = hint.water_level
+    # A vulnerable person the rules can read but the model dropped is added back. Only ever adds.
+    ext.vulnerable += [v for v in hint.vulnerable if v not in ext.vulnerable]
     return ext, res
 
 
@@ -109,8 +111,15 @@ async def triage(ext: Extraction, loc: Location, river_level: str, tier: str) ->
         proposed = Priority(str(res.data.get("priority", sop.value)).upper())
     except ValueError:
         proposed = sop
-    final = bound_priority(proposed, sop)
+    moved_for = str(res.data.get("moved_for", "") or "").strip()[:120]
     reason = str(res.data.get("reason", ""))[:200] or f"SOP score {score:.0f}"
+    if proposed != sop and not moved_for:
+        # A move must name the uncounted fact. Without one, the SOP rubric stands.
+        reason = f"SOP score {score:.0f} kept (move to {proposed.value} named no uncounted fact)"
+        proposed = sop
+    final = bound_priority(proposed, sop)
+    if final != sop and moved_for:
+        reason = f"{reason} · moved for: {moved_for}"[:260]
     if final != proposed:
         reason += f" (clamped from {proposed.value}: max one level from SOP)"
     return Triage(priority=final, score=score, reason=reason, model_tier=res.tier, river_level=river_level), res

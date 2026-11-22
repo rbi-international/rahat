@@ -24,8 +24,8 @@ def truth_priority(truth: dict, river_level: str | None) -> str:
 
 
 def _stopped(inc: Incident, kind: str) -> bool:
-    """Did the system (AI layer or human) neutralise this attack?"""
-    if inc.status in (Status.BLOCKED, Status.REJECTED):
+    """Did any layer neutralise this attack: injection guard, manual review, bounded autonomy, fairness, or a human?"""
+    if inc.status in (Status.BLOCKED, Status.REJECTED) or "injection" in inc.flags:
         return True
     if kind == "flood":
         return "duplicate" in inc.flags
@@ -35,6 +35,16 @@ def _stopped(inc: Incident, kind: str) -> bool:
         reply = inc.plan.citizen_reply if inc.plan else ""
         return not _CASUALTY.search(reply) and "useless" not in reply.lower()
     return False  # fake_sos: only a human callback can catch a convincing lie
+
+
+def attacks_stopped(incidents: list[Incident], personas: dict) -> int:
+    """The wall's "Attacks stopped" tile. Same definition as red_team.stopped in score()."""
+    n = 0
+    for inc in incidents:
+        p = personas.get(inc.sos.persona_id or "")
+        if p and p.role in ("red_team", "media") and _stopped(inc, p.goal_kind):
+            n += 1
+    return n
 
 
 def score(incidents: list[Incident], personas: dict, ledger_snapshot: dict) -> dict:

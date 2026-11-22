@@ -62,7 +62,8 @@ class Store:
             "by_priority": by_priority,
             "dispatched": by_status.get(Status.DISPATCHED.value, 0),
             "people_reached": people,
-            "blocked": by_status.get(Status.BLOCKED.value, 0),
+            "blocked": by_status.get(Status.BLOCKED.value, 0),  # currently in manual review
+
             "median_s_to_plan": round(lat[len(lat) // 2], 1) if lat else None,
             "p90_s_to_plan": round(lat[int(len(lat) * 0.9)], 1) if lat else None,
             "tokens": sum(i.tokens_used for i in items),

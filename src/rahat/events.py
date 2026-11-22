@@ -17,10 +17,15 @@ class Bus:
     def __init__(self, history: int = 300) -> None:
         self._subs: set[asyncio.Queue] = set()
         self._recent: deque[dict] = deque(maxlen=history)
+        self._last_tick: dict | None = None
 
     def publish(self, kind: str, data: dict) -> None:
         msg = {"kind": kind, "ts": time.time(), "data": data}
-        self._recent.append(msg)
+        if kind == "tick":
+            # Ticks are snapshots twice a second; keeping them would push agent lines out of the replay.
+            self._last_tick = msg
+        else:
+            self._recent.append(msg)
         for q in list(self._subs):
             if q.full():
                 try:
@@ -33,6 +38,8 @@ class Bus:
         q: asyncio.Queue = asyncio.Queue(maxsize=500)
         for m in self._recent:
             q.put_nowait(m)
+        if self._last_tick:
+            q.put_nowait(self._last_tick)
         self._subs.add(q)
         return q
 
@@ -45,6 +52,7 @@ class Bus:
 
     def clear(self) -> None:
         self._recent.clear()
+        self._last_tick = None
 
 
 bus = Bus()

@@ -99,6 +99,7 @@ async def guard(sos_id: str, ctx: WorkflowContext[Gate]) -> None:
     result = await injection.screen(clean)
     if result.flagged:
         inc.blocked_reason = "possible prompt injection: " + ", ".join(result.kinds)
+        inc.flags.append("injection")  # stays even if an officer later releases it from review
         for k in result.kinds:
             metrics.GUARD_BLOCKS.labels(f"injection_{k}").inc()
         audit.write("injection_flagged", sos_id, kinds=result.kinds, source=result.source)

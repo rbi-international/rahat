@@ -38,3 +38,15 @@ def test_intake_keeps_a_model_reply_with_a_need_list(monkeypatch):
     assert ext.need == "medical"
     assert ext.language == "pa"
     assert ext.vulnerable == ["elderly", "injured"]
+
+
+def test_intake_adds_back_a_vulnerable_person_the_model_dropped(monkeypatch):
+    reply = {"language": "pa", "summary_en": "Three people, chest-deep water, need a doctor.", "people_count": 3,
+             "vulnerable": [], "water_level": "chest", "location_text": "Ramdas", "need": "medical"}
+
+    async def fake_complete_json(agent, system, user, fallback, **kw):
+        return LLMResult(data=reply, tokens=100, lane="test", model="m", tier="fast", degraded=False, ms=1)
+
+    monkeypatch.setattr(specialists, "complete_json", fake_complete_json)
+    ext, _ = asyncio.run(specialists.intake("doctor chahida, 3 log, baah tut gayi, gale tak paani, Ramdas"))
+    assert "injured" in ext.vulnerable

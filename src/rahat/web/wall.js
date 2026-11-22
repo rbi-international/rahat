@@ -90,7 +90,7 @@ function tick(t) {
   const s = t.stats;
   $("c-recv").textContent = fmt(s.received);
   $("c-disp").textContent = fmt(s.dispatched);
-  $("c-block").textContent = fmt(s.blocked);
+  $("c-block").textContent = fmt(s.attacks_stopped ?? 0);
   $("c-lat").textContent = s.median_s_to_plan != null ? `${s.median_s_to_plan}s` : "–";
   $("qd").textContent = t.queue ? `· ${t.queue} waiting in queue, ${t.in_flight} in flight` : (t.in_flight ? `· ${t.in_flight} in flight` : "");
 }
@@ -133,8 +133,8 @@ function findings(r) {
 
 setInterval(() => {
   if (!startedAt) return;
-  const end = endedAt || Date.now() / 1000;
-  const s = Math.max(0, Math.floor(end - startedAt));
+  if (endedAt) { $("clock").textContent = "Ended"; return; }
+  const s = Math.max(0, Math.floor(Date.now() / 1000 - startedAt));
   $("clock").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 }, 500);
 
