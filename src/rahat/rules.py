@@ -68,8 +68,9 @@ RUBRIC_TEXT = (
 # --------------------------------------------------------------- extraction
 
 _WATER = [
-    ("roof", r"roof|chhat|chhatt|chat pe|chat te|terrace|upar chadh|ਛੱਤ|छत"),
-    ("chest", r"chest|chaati|chhati|chati|gale tak|neck|ਛਾਤੀ|ਗਲ|छाती|गले"),
+    # chhatt?(?!i): "chhat" is the roof, "chhati" is the chest
+    ("roof", r"roof|chhatt?(?!i)|chat pe|chat te|terrace|upar chadh|ਛੱਤ|छत"),
+    ("chest", r"chest|chaati|chhaati|chhati|chati|gale tak|neck|ਛਾਤੀ|ਗਲ|छाती|गले"),
     ("waist", r"waist|kamar|lakk|ਲੱਕ|ਕਮਰ|कमर"),
     ("knee", r"knee|goda|gode|gutne|ghutne|ਗੋਡੇ|घुटन"),
     ("ankle", r"ankle|gitte|ankle deep|ਗਿੱਟੇ|टखन"),

@@ -18,16 +18,26 @@ from ..guardrails.policy import audit
 from ..models import SOS
 from .personas import Persona, make
 
-SIM_TEMPLATES = [
-    "{p} log hain chhat te, paani vadh reha, {v} naal ne, {place} {lm}",
-    "Bachao! {place} mein paani {w} tak, {p} log, {v}",
-    "Help, {p} people stuck at {place} {lm}, water {w} level, {v}",
-    "{place} ch {p} jane fase hoye ne, paani {w} tak, {v}",
-    "Mere ghar {place} mein {w} tak paani aa gaya, {p} log hain, {v}, jaldi bhejo",
-]
-W_WORD = {"roof": "chhat", "chest": "chhati", "waist": "kamar", "knee": "gode", "ankle": "gitte"}
-V_WORD = {"infant": "chhota baby", "child": "bacche", "elderly": "bebe bapu", "pregnant": "pregnant bhabhi",
-          "disabled": "wheelchair wale chacha", "injured": "ek di latt te chot"}
+# Second-wave messages are written from the persona's ground truth, so every fact the scorer
+# checks (water, vulnerable people, need, place) is actually in the text.
+SW_WATER = {"roof": ["chhat te aa gaye", "chhat tak paani"], "chest": ["chhati tak paani", "gale tak paani"],
+            "waist": ["kamar tak paani", "lakk tak paani"], "knee": ["gode tak paani"], "ankle": ["gitte tak paani"]}
+SW_VULN = {"infant": ["chhota baby"], "child": ["bacche"], "elderly": ["bebe bapu"], "pregnant": ["pregnant bhabhi"],
+           "disabled": ["wheelchair wale chacha"],
+           "injured": ["ek di latt te chot", "ek di baah tut gayi", "saanp ne kaat liya", "khoon vag reha"]}
+SW_NEED = {"rescue": ["jaldi bachao", "boat bhejo"], "medical": ["doctor chahida"],
+           "food_water": ["peene da paani te roti nahi"], "information": ["relief camp kithe hai?"]}
+SW_OPEN = ["", "Bachao! ", "Help, ", "Please, "]
+SW_LANDMARK = ["gurudwara kol", "school de pichhe", "nehar de pul kol", ""]
+
+
+def second_wave_text(truth: dict, rng: random.Random) -> str:
+    parts = [f"{truth['people']} log", rng.choice(SW_WATER[truth["water_level"]])]
+    parts += [rng.choice(SW_VULN[v]) for v in truth["vulnerable"]]
+    parts.append(rng.choice(SW_NEED[truth["need"]]))
+    parts.append(f"{truth['village']} {rng.choice(SW_LANDMARK)}".strip())
+    rng.shuffle(parts)
+    return rng.choice(SW_OPEN) + ", ".join(parts)
 
 
 class Drill:
@@ -106,12 +116,7 @@ class Drill:
             if p.role != "citizen":
                 continue
             self.personas[p.id] = p
-            t = p.truth
-            v = ", ".join(V_WORD[x] for x in t["vulnerable"]) or "sab theek par dar lag reha"
-            text = rng.choice(SIM_TEMPLATES).format(
-                p=t["people"], v=v, place=t["village"], lm=rng.choice(["gurudwara kol", "school de pichhe", "nehar de pul kol", ""]),
-                w=W_WORD[t["water_level"]],
-            )
+            text = second_wave_text(p.truth, rng)
             try:
                 pipeline.submit(SOS(text=text, persona_id=p.id, channel="sim", device_id=f"sim-{i}"))
             except OverflowError:
