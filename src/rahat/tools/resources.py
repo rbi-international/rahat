@@ -13,8 +13,16 @@ import threading
 from dataclasses import dataclass, field
 from importlib import resources
 
+from ..config import settings
 from ..models import Assignment, Location, Priority
 from .geo import haversine_km
+
+# Fixed time to launch and reach the water, added to every travel time.
+LAUNCH_MIN = 8
+
+
+def eta_minutes(distance_km: float, speed_kmh: float) -> int:
+    return int(round(distance_km / speed_kmh * 60)) + LAUNCH_MIN
 
 
 @dataclass
@@ -36,6 +44,7 @@ class Asset:
 class Registry:
     assets: dict[str, Asset] = field(default_factory=dict)
     camps: list[dict] = field(default_factory=list)
+    max_eta_min: int = field(default_factory=lambda: settings.max_eta_min)
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     @classmethod
@@ -63,24 +72,30 @@ class Registry:
         if not kinds:
             return Assignment(camp=camp["name"], note="no asset needed, guidance only")
         with self._lock:
-            best: tuple[float, Asset] | None = None
+            best: tuple[float, Asset, float, int] | None = None
+            too_far = False
             for kind_rank, kind in enumerate(kinds):
                 for a in self.assets.values():
                     if a.kind != kind or a.status != "available":
                         continue
                     d = haversine_km(loc.lat, loc.lon, a.lat, a.lon)
+                    eta = eta_minutes(d, a.speed_kmh)
+                    if eta > self.max_eta_min:
+                        # A unit hours away is not help. Wait for a nearer one to come back.
+                        too_far = True
+                        continue
                     # prefer the first-listed kind unless it is much further away
                     cost = d + kind_rank * 15
                     if people > a.capacity:
                         cost += 10
                     if best is None or cost < best[0]:
-                        best = (cost, a)
+                        best = (cost, a, d, eta)
             if best is None:
-                return Assignment(camp=camp["name"], note="all suitable assets busy, queued for next free")
-            a = best[1]
+                note = ("nearest free unit too far, queued for next free nearby" if too_far
+                        else "all suitable assets busy, queued for next free")
+                return Assignment(camp=camp["name"], note=note)
+            _, a, d, eta = best
             a.status, a.assigned_to = "held", sos_id
-        d = haversine_km(loc.lat, loc.lon, a.lat, a.lon)
-        eta = int(round(d / a.speed_kmh * 60)) + 8
         return Assignment(
             asset_id=a.id,
             asset_kind=a.kind,

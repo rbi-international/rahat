@@ -1,7 +1,7 @@
 from rahat import rules
 from rahat.models import Location, Priority
 from rahat.tools import geo
-from rahat.tools.resources import Registry
+from rahat.tools.resources import Registry, eta_minutes
 
 
 def test_rubric_ranks_a_rooftop_infant_above_a_flooded_street():
@@ -38,6 +38,24 @@ def test_allocator_holds_nearest_boat_and_never_double_books():
     a2 = reg.hold_nearest("S2", loc, "rescue", Priority.P2, 3)
     assert a1.asset_id and a2.asset_id and a1.asset_id != a2.asset_id
     assert a1.distance_km <= a2.distance_km
+
+
+def test_allocator_never_holds_a_unit_hours_away():
+    reg = Registry.load()
+    loc = geo.locate("Dera Baba Nanak")
+    # Every boat and NDRF team that could reach Dera Baba Nanak in time is already out.
+    for a in reg.assets.values():
+        if a.kind in ("boat", "ndrf"):
+            d = geo.haversine_km(loc.lat, loc.lon, a.lat, a.lon)
+            if eta_minutes(d, a.speed_kmh) <= reg.max_eta_min:
+                a.status = "held"
+    far = [a for a in reg.assets.values() if a.kind in ("boat", "ndrf") and a.status == "available"]
+    assert far, "the test needs free units that are too far away"
+
+    asg = reg.hold_nearest("S4", loc, "rescue", Priority.P1, 4)
+    assert asg.asset_id is None and asg.eta_min is None
+    assert asg.note == "nearest free unit too far, queued for next free nearby"
+    assert all(a.status == "available" for a in far)  # nothing far was held
 
 
 def test_unresolved_location_gets_no_unit():

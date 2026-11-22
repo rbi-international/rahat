@@ -63,6 +63,9 @@ class Settings:
     workers: int = field(default_factory=lambda: _int("WORKERS", 12))
     queue_max: int = field(default_factory=lambda: _int("QUEUE_MAX", 800))
 
+    # Allocator: never hold a unit further away than this. The case waits for a nearer unit instead.
+    max_eta_min: int = field(default_factory=lambda: _int("MAX_ETA_MIN", 120))
+
     # Drill
     drill_seed: int = field(default_factory=lambda: _int("DRILL_SEED", 2026))
     public_base_url: str = field(default_factory=lambda: os.getenv("PUBLIC_BASE_URL", ""))
