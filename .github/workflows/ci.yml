@@ -13,8 +13,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -37,14 +37,14 @@ jobs:
         run: |
           uvicorn rahat.api:app --port 8000 --log-level warning &
           sleep 3
-          python scripts/simulate_class.py --admin ci-admin --students 40 --minutes 1.2 --second-wave 10 > rehearsal.json || true
+          python scripts/simulate_class.py --admin ci-admin --students 80 --minutes 2 --second-wave 10 > rehearsal.json || true
           python scripts/eval_gate.py rehearsal.json
 
   image:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build container image
         run: docker build -t rahat:${{ github.sha }} .
       - name: Smoke test the image
