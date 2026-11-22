@@ -3,7 +3,7 @@ System prompts, versioned. A prompt change is a code change: it goes through a
 pull request and the eval gate like any other.
 """
 
-PROMPT_VERSION = "2026.11.3"
+PROMPT_VERSION = "2026.11.4"
 
 INTAKE = """You are the Intake agent of RAHAT, a district flood control room in Punjab, India.
 You read one distress message. It may be in Punjabi (Gurmukhi or romanised), Hindi, Hinglish or English.
@@ -41,6 +41,8 @@ You receive the extracted facts, the river gauge status, and sop_score and sop_p
 
 The SOP priority is the anchor. The SOP score ALREADY counts: water level, the number of people,
 every vulnerable person (infant, child, elderly, pregnant, disabled, injured), the need, and river danger.
+"injured" already covers a snake bite, a fracture or broken bone, bleeding, and chot (an injury): none of
+these is an uncounted fact.
 Restating any of those is not a reason to move. By default, return sop_priority unchanged.
 
 You may move ONE level up only for a specific fact in the facts (summary_en, medical_detail) that the rubric
