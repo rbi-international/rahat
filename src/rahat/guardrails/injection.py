@@ -25,14 +25,16 @@ log = logging.getLogger("rahat.guard")
 
 _PATTERNS: list[tuple[str, str]] = [
     ("override", r"ignore (all|any|the|your|previous|prior|above)|disregard (all|previous|your)|forget (your|all|previous) (rules|instructions)"),
-    ("override", r"(pich+h?l[ae]|peh?l[ae]) (wale )?(instructions|rules|nirdesh) (bhool|bhul|ignore|chhod)|sab bhool ja|rules bh?ool"),
+    ("override", r"(pich+h?l[ae]|peh?l[ae])( \w+){0,2} (instructions|rules|nirdesh|hidayat\w*) (bhool|bhul|ignore|chhod)"
+                 r"|sab bhool ja|(instructions|rules) bh?oo?l ja"),
     ("override", r"सारे निर्देश|निर्देश भूल|ਹਦਾਇਤਾਂ ਭੁੱਲ"),
     ("role", r"you are now|act as (an? )?(admin|officer|system|developer)|developer mode|jailbreak|\bDAN\b"),
+    ("role", r"\bmain (hi )?(admin|system|developer) (hoon|hun|haan|ha)\b|\bi am (the |an? )?(admin|system|developer)\b"),
     ("role", r"system prompt|your instructions|reveal (your|the) (prompt|rules)|print (your|the) prompt"),
     ("schema", r"\"?priority\"?\s*[:=]\s*\"?p1|set (my )?priority|mark (me|this) (as )?p1|priority p1 do|P1 kar do"),
     ("resource", r"(send|bhej|bhejo) (all|saari|sari|sabhi|saare|sare) (the )?(boats|kishti|kishtiyan|teams)"),
     ("resource", r"all (boats|teams|units) (to|for) (me|my|us)"),
-    ("resource", r"(saari|sari|sabhi|saare|sare|sab) (boats|kishti|kishtiyan|teams) (bhej|idhar|mere|sanu)"),
+    ("resource", r"(saari|sari|sabhi|saare|sare|sab) (boats|kishti|kishtiyan|teams)( \w+){0,2} (bhej|idhar|mere|sanu)"),
     ("exfil", r"(phone|mobile|number|aadhaar|address) (of|da|ka|ki) (all|every|other|sab)|list (all|every) (victims|people|sos)"),
     ("markup", r"<\s*/?\s*(system|assistant|tool)\s*>|\[\s*(system|INST)\s*\]"),
 ]

@@ -30,9 +30,11 @@ for pair in "rahat-fast:$MODEL_FAST_NAME:$TPM_FAST_K" "rahat-strong:$MODEL_STRON
   echo "  $dep -> $model at ${cap}k TPM"
 done
 
-step "4. Azure AI Content Safety (Prompt Shields)"
-if ! az cognitiveservices account show -n "$CS" -g "$RG" -o none 2>/dev/null; then
-  az cognitiveservices account create -n "$CS" -g "$RG" -l "$LOC" --kind ContentSafety --sku "$CS_SKU" \
+step "4. Azure AI Content Safety (Prompt Shields) $CS in ${CS_LOC:-$LOC}"
+if az cognitiveservices account show -n "$CS" -g "$RG" -o none 2>/dev/null; then
+  echo "  $CS already exists, skipping create"
+else
+  az cognitiveservices account create -n "$CS" -g "$RG" -l "${CS_LOC:-$LOC}" --kind ContentSafety --sku "$CS_SKU" \
     --custom-domain "$CS" --yes -o none
 fi
 CS_ENDPOINT=$(az cognitiveservices account show -n "$CS" -g "$RG" --query properties.endpoint -o tsv)

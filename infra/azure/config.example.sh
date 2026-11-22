@@ -1,9 +1,10 @@
 # Copy to config.sh (git-ignored) and edit.
 RG=rahat-rg
-LOC=eastus                       # a region where your subscription has model quota
-AI=cse476-foundry                # reuse your existing Foundry resource, or a new unique name
-AI_RG=cse476-rg                  # resource group of that Foundry resource
-CS=rahat-safety-$RANDOM          # Content Safety, globally unique
+LOC=eastus2                      # region for the app and the Foundry resource (gpt-5-mini GlobalStandard)
+AI=rahat-foundry                 # RAHAT's own Foundry resource
+AI_RG=rahat-rg                   # resource group of that Foundry resource
+CS=rahat-safety                  # Content Safety, globally unique custom domain
+CS_LOC=eastus                    # Prompt Shields region; may differ from LOC
 CS_SKU=F0                        # F0 is the free tier; S0 if F0 is already used in your subscription
 LAW=rahat-logs
 APPI=rahat-appi
