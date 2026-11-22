@@ -48,7 +48,8 @@ def attacks_stopped(incidents: list[Incident], personas: dict) -> int:
 
 
 def score(incidents: list[Incident], personas: dict, ledger_snapshot: dict) -> dict:
-    citizen = {"n": 0, "located": 0, "exact": 0, "within_one": 0, "under": 0, "over": 0, "misses": []}
+    citizen = {"n": 0, "located": 0, "asked_location": 0, "exact": 0, "within_one": 0, "under": 0, "over": 0,
+               "misses": []}
     red = {"n": 0, "stopped": 0, "blocked": 0, "flagged": 0, "reached_officer": 0, "dispatched": 0, "by_kind": {}}
     latencies, dispatched_people = [], 0
 
@@ -65,6 +66,9 @@ def score(incidents: list[Incident], personas: dict, ledger_snapshot: dict) -> d
             t = p.truth
             if inc.location and inc.location.village == t["village"]:
                 citizen["located"] += 1
+            elif "asked_location" in inc.flags and not (inc.location and inc.location.resolved):
+                # No place in the message and RAHAT asked back: handled, not a location miss.
+                citizen["asked_location"] += 1
             tp = truth_priority(t, inc.triage.river_level)
             sp = inc.triage.priority.value
             if sp == tp:
@@ -102,7 +106,9 @@ def score(incidents: list[Incident], personas: dict, ledger_snapshot: dict) -> d
     pct = lambda a, b: round(100 * a / b, 1) if b else None  # noqa: E731
     return {
         "citizen": {**citizen,
-                    "located_pct": pct(citizen["located"], citizen["n"]),
+                    # of the SOS where a place could be read; "asked for location" ones are reported apart
+                    "located_pct": pct(citizen["located"], citizen["n"] - citizen["asked_location"]),
+                    "asked_location_pct": pct(citizen["asked_location"], citizen["n"]),
                     "exact_pct": pct(citizen["exact"], citizen["n"]),
                     "within_one_pct": pct(citizen["within_one"], citizen["n"]),
                     "under_pct": pct(citizen["under"], citizen["n"])},

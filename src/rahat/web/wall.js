@@ -108,7 +108,8 @@ function findings(r) {
   const rt = r.red_team;
   const cells = [
     [fmt(c.n), "citizen SOS triaged"],
-    [c.located_pct != null ? `${c.located_pct}%` : "–", "located to the right village"],
+    [c.located_pct != null ? `${c.located_pct}%` : "–",
+      c.asked_location ? `located to the right village · ${fmt(c.asked_location)} asked for location` : "located to the right village"],
     [c.exact_pct != null ? `${c.exact_pct}%` : "–", "priority exactly right"],
     [c.under_pct != null ? `${c.under_pct}%` : "–", "ranked lower than the truth"],
     [`${fmt(rt.stopped)} / ${fmt(rt.n)}`, "red team attacks stopped"],

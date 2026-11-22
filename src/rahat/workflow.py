@@ -149,6 +149,22 @@ async def geo_node(sos_id: str, ctx: WorkflowContext[str]) -> None:
     await ctx.send_message("geo")
 
 
+def _mark_asked_location(inc: Incident) -> None:
+    """The commander's reply asked the citizen to resend with a landmark (see specialists.commander)."""
+    if not (inc.location and inc.location.resolved) and "asked_location" not in inc.flags:
+        inc.flags.append("asked_location")
+        emit(inc.sos.id, "commander", "asked for location", "citizen asked to resend with a village or landmark",
+             level="warn")
+
+
+def _location_follow_up(other_id: str, device: str, inc: Incident) -> bool:
+    """A resend from the same phone after RAHAT asked where they are is an answer, not a duplicate."""
+    if device != inc.sos.device_id:
+        return False
+    other = store.get(other_id)
+    return bool(other and "asked_location" in other.flags)
+
+
 @executor(id="verifier")
 async def verifier(sos_id: str, ctx: WorkflowContext[str]) -> None:
     inc = _inc(sos_id)
@@ -157,6 +173,10 @@ async def verifier(sos_id: str, ctx: WorkflowContext[str]) -> None:
     for other_id, device, text in store.recent_texts():
         if other_id == sos_id:
             continue
+        if _location_follow_up(other_id, device, inc):
+            if "location follow-up" not in flags:
+                flags.append("location follow-up")
+            continue
         if difflib.SequenceMatcher(None, text.lower(), inc.sos.text.lower()).ratio() > 0.9:
             dup_of = other_id
             flags.append("same device repeat" if device == inc.sos.device_id else "near-identical text")
@@ -164,7 +184,8 @@ async def verifier(sos_id: str, ctx: WorkflowContext[str]) -> None:
     ext = inc.extraction
     if ext and ext.people_count > 60:
         flags.append("implausible head count")
-    inc.verification = Verification(genuine=not flags, duplicate_of=dup_of, flags=flags)
+    doubts = [f for f in flags if f != "location follow-up"]
+    inc.verification = Verification(genuine=not doubts, duplicate_of=dup_of, flags=flags)
     if dup_of:
         inc.flags.append("duplicate")
     emit(sos_id, "verifier", "checked", ", ".join(flags) or "no duplicate, plausible",
@@ -200,6 +221,7 @@ async def info_desk(r: Routed, ctx: WorkflowContext) -> None:
                                                                   inc.triage.priority, 0))
     inc.plan = plan
     _charge(inc, res)
+    _mark_asked_location(inc)
     inc.status = Status.INFO_SENT
     inc.finished_at = time.time()
     emit(r.sos_id, "info_desk", "replied", plan.citizen_reply, res, level="ok")
@@ -226,6 +248,7 @@ async def commander(sos_id: str, ctx: WorkflowContext) -> None:
     plan, res = await specialists.commander(inc.extraction, inc.location, inc.triage, inc.assignment)
     inc.plan = plan
     _charge(inc, res)
+    _mark_asked_location(inc)
     inc.status = Status.AWAITING_APPROVAL
     inc.finished_at = time.time()
     emit(sos_id, "commander", "plan ready", plan.officer_brief, res, level="ok")

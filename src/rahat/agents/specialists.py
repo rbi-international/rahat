@@ -8,6 +8,7 @@ The four model-backed specialists. Each one:
 from __future__ import annotations
 
 import json
+import re
 
 from pydantic import ValidationError
 
@@ -125,12 +126,37 @@ async def triage(ext: Extraction, loc: Location, river_level: str, tier: str) ->
     return Triage(priority=final, score=score, reason=reason, model_tier=res.tier, river_level=river_level), res
 
 
+ASK_LOCATION = {
+    "pa": "ਤੁਹਾਡਾ ਸੁਨੇਹਾ ਮਿਲ ਗਿਆ ਹੈ, ਪਰ ਤੁਹਾਡੀ ਥਾਂ ਨਹੀਂ ਪਤਾ ਲੱਗੀ। ਨੇੜੇ ਦੇ ਪਿੰਡ, ਗੁਰਦੁਆਰੇ, ਸਕੂਲ ਜਾਂ ਕਿਸੇ ਨਿਸ਼ਾਨੀ ਦਾ ਨਾਮ ਲਿਖ ਕੇ "
+          "ਦੁਬਾਰਾ ਭੇਜੋ। ਉੱਚੀ ਥਾਂ 'ਤੇ ਰਹੋ।",
+    "hi": "आपका संदेश मिल गया है, पर आपकी जगह पता नहीं चली। पास के गांव, गुरुद्वारे, स्कूल या किसी निशानी का नाम लिखकर "
+          "दोबारा भेजें। ऊंची जगह पर रहें।",
+    "hinglish": "Aapka message mil gaya, par aapki jagah pata nahi chali. Paas ke gaon, gurdwara, school ya kisi landmark "
+                "ka naam likh kar dobara bhejein. Oonchi jagah par rahein.",
+    "en": "Your message is received, but we could not find your location. Send it again with the nearest village, "
+          "gurdwara, school or landmark. Stay on high ground.",
+}
+# Words that show a reply really asks for a place, in any of the four languages.
+_ASKS_PLACE = re.compile(r"village|gurdwara|gurudwara|school|landmark|gaon|gaaon|pind|ਪਿੰਡ|ਗੁਰਦੁਆਰ|ਸਕੂਲ|गांव|गाँव|"
+                         r"गुरुद्वार|स्कूल", re.I)
+
+
+def ask_location_reply(language: str) -> str:
+    return ASK_LOCATION.get(language, ASK_LOCATION["en"])
+
+
 async def commander(
     ext: Extraction, loc: Location, tri: Triage, asg: Assignment
 ) -> tuple[Plan, LLMResult]:
     eta = f"about {asg.eta_min} minutes" if asg.eta_min else "as soon as a unit is free"
 
     def fallback() -> dict:
+        if not loc.resolved:
+            return {
+                "officer_brief": f"{tri.priority.value}: {ext.people_count} people, water {ext.water_level}, "
+                                 "LOCATION UNKNOWN. Citizen asked to resend with a landmark; call back if urgent.",
+                "citizen_reply": ask_location_reply(ext.language),
+            }
         if ext.need == "information":
             camp = asg.camp or "the nearest relief camp"
             return {
@@ -159,6 +185,7 @@ async def commander(
         "eta_min": asg.eta_min,
         "camp": asg.camp,
         "language": ext.language,
+        "location_known": loc.resolved,
     }
     res = await complete_json(
         "commander",
@@ -172,6 +199,9 @@ async def commander(
         plan = Plan.model_validate(res.data)
     except ValidationError:
         plan = Plan.model_validate(fallback())
+    if not loc.resolved and not _ASKS_PLACE.search(plan.citizen_reply):
+        # The model forgot to ask where they are. Asking back is exact work: code guarantees it.
+        plan.citizen_reply = ask_location_reply(ext.language)
     plan.officer_brief = clean_reply(plan.officer_brief, 240)
     plan.citizen_reply = clean_reply(plan.citizen_reply, 320)
     return plan, res
