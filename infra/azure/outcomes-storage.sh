@@ -26,7 +26,7 @@ fi
 ST_ID=$(az storage account show -n "$ST" -g "$RG" --query id -o tsv 2>/dev/null || echo "<new account id>")
 
 echo "== Container $CONTAINER"
-run az storage container create --account-name "$ST" -n "$CONTAINER" --auth-mode login -o none
+run az storage container-rm create --storage-account "$ST" -g "$RG" -n "$CONTAINER" --public-access off -o none
 
 echo "== Roles: the app writes, you read (for scripts/outcomes_report.py --blob)"
 PRINCIPAL=$(az containerapp show -n "$APP" -g "$RG" --query identity.principalId -o tsv)
