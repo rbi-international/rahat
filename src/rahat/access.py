@@ -44,6 +44,9 @@ class Device:
     last_sent: float = 0.0
     asked: int = 0
     last_asked: float = 0.0
+    # Outcome phases this phone has answered or skipped ("entry", "exit"). The answers
+    # themselves are stored by anonymous id only, never with the device.
+    outcomes: set[str] = field(default_factory=set)
 
 
 class Access:

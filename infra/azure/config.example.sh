@@ -10,6 +10,7 @@ LAW=rahat-logs
 APPI=rahat-appi
 ACR=rahatacr0000                 # pick ONE fixed name (az acr check-name -n <name>); never $RANDOM, it changes every run
 ENV_NAME=rahat-env
+ST=rahatst0000                   # storage for learning-outcome snapshots; globally unique, lowercase + digits
 APP=rahat
 GITHUB_REPO=rbi-international/rahat
 

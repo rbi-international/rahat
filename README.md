@@ -1645,6 +1645,17 @@ az ad app delete --id <AZURE_CLIENT_ID>
 
 Portal → **Cost Management** → **Cost analysis** → scope: your subscription → filter **Resource group** = yours → group by **Service name**. Costs show up with a delay of up to a day. Compare with the findings' `cost_inr`, which is only the app's flat-rate estimate.
 
+### 14.9 Learning outcomes
+
+Each phone shows a short **entry check** when it joins (three questions, one confidence item, a Skip button) and an **exit debrief** when you press **Terminate exercise** (the same four items, three agreement items, an optional comment). The questions live in `outcomes.py` → `QUESTIONS`; the answer key never leaves the server.
+
+- **Anonymous.** The phone makes a random id in `localStorage` (`sos.js` → `anonId()`). Answers are stored by that id only: no name, phone number, device id or persona. Comments pass `pii.redact()` before they are stored.
+- **Persistent.** Answers live in memory. A JSON snapshot is written on Terminate, a few seconds after debrief answers arrive, before **Reset room**, before a new session and at shutdown (`api.py` → `save_outcomes()`). On Azure it goes to a private Blob container the app writes with its managed identity (`OUTCOMES_BLOB_URL`, set by `infra/azure/outcomes-storage.sh`); locally set `OUTCOMES_DIR`. A storage failure is logged and never stops the drill.
+- **Numbers.** `GET /api/admin/outcomes` (admin only) returns `n_entry`, `n_exit`, `n_paired`, paired quiz and confidence means entry vs exit, % agree (4 or 5) per item, and comments as a separate list.
+- **Report.** `python scripts/outcomes_report.py --blob <storage-account> --out outcomes_report` (or `--base <app> --admin $ADMIN_TOKEN`, or `--snapshots <folder>`) writes `outcomes.csv`, two charts and `summary.txt` with a paragraph for a report. Entry and exit pair by the anonymous id within each run.
+
+On an existing deployment, add the storage once, **before** class (the new app setting restarts the app): set `ST=<name>` in `config.sh`, then `./infra/azure/outcomes-storage.sh --dry-run` and `./infra/azure/outcomes-storage.sh`.
+
 ---
 
 ## 15. Results

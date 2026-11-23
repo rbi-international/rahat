@@ -103,6 +103,9 @@ az containerapp update -n "$APP" -g "$RG" --image "$ACR.azurecr.io/rahat:bootstr
     APPLICATIONINSIGHTS_CONNECTION_STRING=secretref:appi \
     ADMIN_TOKEN=secretref:admin-token METRICS_TOKEN=secretref:metrics-token -o none
 
+step "9b. Blob container for learning-outcome snapshots"
+"$HERE/outcomes-storage.sh"
+
 step "10. GitHub Actions identity (OpenID Connect, no stored password)"
 # Least privilege: AcrPush on the registry and Contributor on this one app. Nothing at RG
 # or subscription scope. AcrPush cannot run ACR Tasks, so deploy.yml builds on the runner.

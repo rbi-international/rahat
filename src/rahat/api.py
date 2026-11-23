@@ -38,6 +38,7 @@ from .guardrails.policy import audit
 from .lanes import get_lane
 from .llm import breaker, ledger
 from .models import SOS, Status
+from .outcomes import QUESTIONS, Outcomes, make_sink
 from .pipeline import pipeline, wall_stats
 from .router import router
 from .store import store
@@ -49,16 +50,41 @@ log = logging.getLogger("rahat.api")
 
 WEB = resources.files("rahat").joinpath("web")
 COOKIE_DEV, COOKIE_ROLE = "rahat_dev", "rahat_role"
+outcomes = Outcomes(make_sink(settings.outcomes_blob_url, settings.outcomes_dir))
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_telemetry(app)
     await pipeline.start()
-    log.info("RAHAT %s up. lane=%s fallback=%s allocation=%s", __version__, settings.provider,
-             settings.fallback_provider or "-", settings.allocation_tokens)
+    log.info("RAHAT %s up. lane=%s fallback=%s allocation=%s outcomes=%s", __version__, settings.provider,
+             settings.fallback_provider or "-", settings.allocation_tokens,
+             "blob" if settings.outcomes_blob_url else ("folder" if settings.outcomes_dir else "memory"))
     yield
+    if outcomes.has_data():  # scale-down or redeploy: keep what is in memory
+        await save_outcomes("shutdown")
     await pipeline.stop()
+
+
+async def save_outcomes(reason: str) -> str | None:
+    """Write an outcomes snapshot off the event loop. Never raises."""
+    return await asyncio.to_thread(outcomes.save, reason)
+
+
+_pending_save: asyncio.Task | None = None
+
+
+def _save_soon() -> None:
+    """Debrief answers arrive after Terminate: save them shortly after, at most once per delay."""
+    global _pending_save
+    if _pending_save and not _pending_save.done():
+        return
+
+    async def later():
+        await asyncio.sleep(settings.outcomes_save_delay_s)
+        await save_outcomes("debrief")
+
+    _pending_save = asyncio.create_task(later())
 
 
 # App assets revalidate on every load (ETag, so an unchanged file is a 304) and a new deploy shows at once.
@@ -216,7 +242,73 @@ def me(request: Request):
         "sent": dev.sent,
         "limit": settings.sos_max_per_device,
         "messages": [_citizen_view(i) for i in sorted(mine, key=lambda i: i.sos.received_at, reverse=True)],
+        # The phone shows the entry check until this is true, and the debrief once the exercise ends.
+        "outcomes": {"entry_done": "entry" in dev.outcomes, "exit_done": "exit" in dev.outcomes},
     }
+
+
+# ------------------------------------------------------------------ learning outcomes
+
+ANON = r"^[A-Za-z0-9_-]{8,64}$"
+Choice = Literal["a", "b", "c", "d"]
+
+
+class EntryIn(BaseModel):
+    anon_id: str = Field(pattern=ANON)
+    q1: Choice
+    q2: Choice
+    q3: Choice
+    c1: int = Field(ge=1, le=5)
+
+
+class ExitIn(EntryIn):
+    helped: int = Field(ge=1, le=5)
+    dashboard: int = Field(ge=1, le=5)
+    recommend: int = Field(ge=1, le=5)
+    comment: str = Field(default="", max_length=500)
+
+
+class SkipIn(BaseModel):
+    phase: Literal["entry", "exit"]
+
+
+@app.get("/api/outcomes/questions")
+def outcome_questions():
+    return QUESTIONS  # the answer key stays on the server
+
+
+@app.post("/api/outcomes/entry")
+def outcome_entry(body: EntryIn, request: Request):
+    dev = _device(request)
+    if drill.ended_at:
+        raise HTTPException(409, "the exercise has ended")
+    if "entry" in dev.outcomes or not outcomes.record(body.anon_id, "entry", body.model_dump(exclude={"anon_id"})):
+        raise HTTPException(409, "already answered")
+    dev.outcomes.add("entry")
+    return {"ok": True}
+
+
+@app.post("/api/outcomes/exit")
+async def outcome_exit(body: ExitIn, request: Request):  # async: _save_soon needs the running loop
+    dev = _device(request)
+    if not drill.ended_at:
+        raise HTTPException(409, "the debrief opens when the exercise is terminated")
+    answers = body.model_dump(exclude={"anon_id"})
+    answers["comment"] = pii.redact(answers["comment"].strip())[0]  # no phone number is ever stored
+    if "exit" in dev.outcomes or not outcomes.record(body.anon_id, "exit", answers):
+        raise HTTPException(409, "already answered")
+    dev.outcomes.add("exit")
+    _save_soon()
+    return {"ok": True}
+
+
+@app.post("/api/outcomes/skip")
+def outcome_skip(body: SkipIn, request: Request):
+    dev = _device(request)
+    if body.phase not in dev.outcomes:
+        dev.outcomes.add(body.phase)
+        outcomes.skip(body.phase)
+    return {"ok": True}
 
 
 class SOSIn(BaseModel):
@@ -398,7 +490,10 @@ class SessionIn(BaseModel):
 
 @app.post("/api/admin/session")
 async def open_session(body: SessionIn, request: Request, _: str = Depends(need_admin)):
+    if outcomes.has_data():
+        await save_outcomes("new_session")
     s = access.open_session(body.minutes)
+    outcomes.clear(session_id=s.code)
     audit.write("session_opened", None, actor="admin", minutes=body.minutes)
     return {"code": s.code, "officer_code": s.officer_code, "join_url": _join_url(request, s.code),
             "expires_at": s.expires_at}
@@ -446,6 +541,7 @@ async def inject(kind: InjectKind, body: InjectIn | None = None, _: str = Depend
         access.close_session()
         result = scoring.score(store.all(), drill.personas, ledger.snapshot())
         bus.publish("score", result)
+        await save_outcomes("terminate")
         return result
     if drill.started_at is None:
         raise HTTPException(409, "start the exercise first")
@@ -469,6 +565,17 @@ def score_now(_: str = Depends(need_admin)):
     return scoring.score(store.all(), drill.personas, ledger.snapshot())
 
 
+@app.get("/api/admin/outcomes")
+def outcomes_summary(_: str = Depends(need_admin)):
+    return outcomes.summary()
+
+
+@app.get("/api/admin/outcomes/snapshot")
+def outcomes_snapshot(_: str = Depends(need_admin)):
+    """The raw anonymous answers, for scripts/outcomes_report.py."""
+    return outcomes.snapshot("export")
+
+
 class ResetIn(BaseModel):
     allocation: int | None = Field(default=None, ge=10_000, le=50_000_000)
 
@@ -476,6 +583,9 @@ class ResetIn(BaseModel):
 @app.post("/api/admin/reset")
 async def reset(body: ResetIn | None = None, _: str = Depends(need_admin)):
     """Wipe the room for a fresh run. Never touches the code or the deployment."""
+    if outcomes.has_data():
+        await save_outcomes("reset")  # the answers are written before they are wiped
+    outcomes.clear(session_id=access.session.code if access.session else None)
     store.clear()
     drill.reset()
     pii.vault.clear()

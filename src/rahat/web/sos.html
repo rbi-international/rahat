@@ -25,6 +25,19 @@
     <p class="muted">Look at the main screen for what happened.</p>
   </section>
 
+  <section id="check" class="card check hide" aria-labelledby="check-title">
+    <h2 id="check-title">Quick check</h2>
+    <p class="muted" id="check-intro"></p>
+    <form id="check-form"></form>
+    <div class="check-actions">
+      <button class="btn ok" id="check-send" type="button">Submit</button>
+      <button class="btn ghost" id="check-skip" type="button">Skip</button>
+    </div>
+    <div class="error" id="check-err" role="alert"></div>
+  </section>
+
+  <section id="check-thanks" class="card hide"><p>Thank you. Your answers are saved anonymously.</p></section>
+
   <div id="banner" class="banner hide" role="status"></div>
 
   <article id="persona" class="card">

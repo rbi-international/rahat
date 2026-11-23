@@ -70,5 +70,11 @@ class Settings:
     drill_seed: int = field(default_factory=lambda: _int("DRILL_SEED", 2026))
     public_base_url: str = field(default_factory=lambda: os.getenv("PUBLIC_BASE_URL", ""))
 
+    # Learning-outcome snapshots: an Azure Blob container (live, managed identity) or a local folder.
+    # With neither set, answers stay in memory only and the admin endpoint still works.
+    outcomes_blob_url: str = field(default_factory=lambda: os.getenv("OUTCOMES_BLOB_URL", "").strip())
+    outcomes_dir: str = field(default_factory=lambda: os.getenv("OUTCOMES_DIR", "").strip())
+    outcomes_save_delay_s: float = field(default_factory=lambda: _float("OUTCOMES_SAVE_DELAY_S", 10.0))
+
 
 settings = Settings()
