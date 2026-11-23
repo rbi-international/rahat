@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1100" height="700" viewBox="0 0 1100 700" font-family="Arial, Helvetica, sans-serif">
+  <rect width="100%" height="100%" fill="#F7F3EA"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606A"/>
+    </marker>
+  </defs>
+
+  <text x="550" y="38" font-size="22" font-weight="bold" fill="#1F2328" text-anchor="middle">Model router: which tier runs the Triage agent</text>
+  <text x="550" y="62" font-size="14" fill="#57606A" text-anchor="middle">src/rahat/router.py, called from workflow.triage_node, rewarded from pipeline.Pipeline.decide</text>
+
+  <!-- Row 1 -->
+  <rect x="20" y="90" width="190" height="115" rx="8" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="115" y="118" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Intake agent</text>
+  <text x="115" y="142" font-size="13" fill="#1F2328" text-anchor="middle">extracts vulnerable[]</text>
+  <text x="115" y="160" font-size="13" fill="#1F2328" text-anchor="middle">and water_level</text>
+  <text x="115" y="178" font-size="13" fill="#1F2328" text-anchor="middle">from the SOS</text>
+
+  <rect x="250" y="90" width="250" height="115" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="375" y="118" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Router.context()</text>
+  <text x="375" y="142" font-size="13" fill="#1F2328" text-anchor="middle">complex: any vulnerable person,</text>
+  <text x="375" y="160" font-size="13" fill="#1F2328" text-anchor="middle">or water at chest or roof</text>
+  <text x="375" y="184" font-size="13" fill="#1F2328" text-anchor="middle">simple: everything else</text>
+
+  <rect x="540" y="90" width="300" height="115" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="690" y="118" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Router.choose(ctx)</text>
+  <text x="556" y="140" font-size="13" fill="#1F2328">1. sample Beta(alpha, beta) for each arm</text>
+  <text x="556" y="157" font-size="13" fill="#1F2328">2. subtract COST: fast 0.0, strong 0.15</text>
+  <text x="556" y="174" font-size="13" fill="#1F2328">3. pick the highest score, pulls += 1</text>
+  <text x="556" y="194" font-size="12" fill="#57606A">metric: rahat_router_choice_total</text>
+
+  <rect x="880" y="90" width="200" height="115" rx="8" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="980" y="118" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Triage agent</text>
+  <text x="980" y="142" font-size="13" fill="#1F2328" text-anchor="middle">runs on the chosen</text>
+  <text x="980" y="160" font-size="13" fill="#1F2328" text-anchor="middle">tier (fast or strong)</text>
+  <text x="980" y="178" font-size="13" fill="#1F2328" text-anchor="middle">stored as</text>
+  <text x="980" y="196" font-size="13" fill="#1F2328" text-anchor="middle">Triage.model_tier</text>
+
+  <line x1="210" y1="147" x2="250" y2="147" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="500" y1="147" x2="540" y2="147" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="840" y1="147" x2="880" y2="147" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="520" y="139" font-size="12" fill="#57606A" text-anchor="middle">ctx</text>
+  <text x="860" y="139" font-size="12" fill="#57606A" text-anchor="middle">tier</text>
+
+  <!-- Arm state table -->
+  <rect x="250" y="250" width="590" height="180" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+  <text x="545" y="274" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">Arm state: two arms per context, each starts Arm(alpha=1, beta=1, pulls=0)</text>
+  <text x="485" y="302" font-size="13" font-weight="bold" fill="#1F2328" text-anchor="middle">fast (COST 0.0)</text>
+  <text x="715" y="302" font-size="13" font-weight="bold" fill="#1F2328" text-anchor="middle">strong (COST 0.15)</text>
+  <text x="270" y="342" font-size="13" font-weight="bold" fill="#1F2328">simple</text>
+  <text x="270" y="400" font-size="13" font-weight="bold" fill="#1F2328">complex</text>
+  <rect x="375" y="312" width="220" height="50" rx="4" fill="#FFFFFF" stroke="#A16207"/>
+  <rect x="605" y="312" width="220" height="50" rx="4" fill="#FFFFFF" stroke="#A16207"/>
+  <rect x="375" y="370" width="220" height="50" rx="4" fill="#FFFFFF" stroke="#A16207"/>
+  <rect x="605" y="370" width="220" height="50" rx="4" fill="#FFFFFF" stroke="#A16207"/>
+  <text x="485" y="342" font-size="13" fill="#1F2328" text-anchor="middle">Beta(alpha, beta), pulls</text>
+  <text x="715" y="342" font-size="13" fill="#1F2328" text-anchor="middle">Beta(alpha, beta), pulls</text>
+  <text x="485" y="400" font-size="13" fill="#1F2328" text-anchor="middle">Beta(alpha, beta), pulls</text>
+  <text x="715" y="400" font-size="13" fill="#1F2328" text-anchor="middle">Beta(alpha, beta), pulls</text>
+
+  <line x1="690" y1="250" x2="690" y2="205" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="700" y="232" font-size="12" fill="#57606A">sampled</text>
+
+  <!-- Officer -->
+  <rect x="880" y="270" width="200" height="100" rx="8" fill="#DFF3E3" stroke="#15803D" stroke-width="1.5"/>
+  <text x="980" y="298" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Duty officer</text>
+  <text x="980" y="322" font-size="13" fill="#1F2328" text-anchor="middle">approves or rejects</text>
+  <text x="980" y="340" font-size="13" fill="#1F2328" text-anchor="middle">the plan</text>
+  <text x="980" y="358" font-size="12" fill="#57606A" text-anchor="middle">Pipeline.decide()</text>
+  <line x1="980" y1="205" x2="980" y2="270" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="970" y="242" font-size="12" fill="#57606A" text-anchor="end">plan to console</text>
+
+  <!-- Reward -->
+  <rect x="600" y="470" width="480" height="115" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="840" y="496" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">router.reward(ctx, tier, accepted)</text>
+  <text x="618" y="520" font-size="13" fill="#1F2328">approve: alpha += 1 (an accepted plan is the reward)</text>
+  <text x="618" y="539" font-size="13" fill="#1F2328">reject: beta += 1</text>
+  <text x="618" y="558" font-size="13" fill="#1F2328">not counted: released manual-review items</text>
+  <text x="618" y="577" font-size="13" fill="#1F2328">ignored: tier "rules" (no model ran)</text>
+  <line x1="980" y1="370" x2="980" y2="470" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="970" y="425" font-size="12" fill="#57606A" text-anchor="end">decision</text>
+  <line x1="700" y1="470" x2="700" y2="430" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="710" y="455" font-size="12" fill="#57606A">update the arm</text>
+
+  <!-- Snapshot -->
+  <rect x="20" y="470" width="540" height="115" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="290" y="496" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Router.snapshot()</text>
+  <text x="290" y="522" font-size="13" fill="#1F2328" text-anchor="middle">accept_rate = alpha / (alpha + beta) for each arm</text>
+  <text x="290" y="542" font-size="13" fill="#1F2328" text-anchor="middle">plus pulls, per context</text>
+  <text x="290" y="562" font-size="13" fill="#1F2328" text-anchor="middle">shown on the officer console</text>
+  <line x1="350" y1="430" x2="350" y2="470" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="360" y="455" font-size="12" fill="#57606A">read</text>
+
+  <!-- Legend -->
+  <rect x="20" y="612" width="16" height="16" fill="#FCE3C8" stroke="#C2410C"/>
+  <text x="42" y="625" font-size="13" fill="#1F2328">model call</text>
+  <rect x="140" y="612" width="16" height="16" fill="#DCEBFA" stroke="#1D4ED8"/>
+  <text x="162" y="625" font-size="13" fill="#1F2328">plain code</text>
+  <rect x="260" y="612" width="16" height="16" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="282" y="625" font-size="13" fill="#1F2328">human</text>
+  <rect x="350" y="612" width="16" height="16" fill="#FFF6C7" stroke="#A16207"/>
+  <text x="372" y="625" font-size="13" fill="#1F2328">state</text>
+
+  <text x="550" y="672" font-size="15" font-style="italic" fill="#1F2328" text-anchor="middle">Contextual bandit with Thompson sampling at inference time. Not RLHF: no model weights change.</text>
+</svg>

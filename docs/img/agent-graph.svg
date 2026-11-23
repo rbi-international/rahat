@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1200" height="1050" viewBox="0 0 1200 1050" font-family="Arial, Helvetica, sans-serif">
+<rect width="100%" height="100%" fill="#F7F3EA"/>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker>
+</defs>
+<g fill="#1F2328" font-size="13">
+<text x="60" y="42" font-size="22" font-weight="bold">The agent graph for one SOS</text>
+<text x="60" y="64">Edge labels are the message types that travel on each edge. Everything else is read from the incident board.</text>
+
+<rect x="60" y="76" width="1080" height="830" rx="10" fill="none" stroke="#8A8270" stroke-width="1.2" stroke-dasharray="7,4"/>
+<text x="76" y="100" font-weight="bold">Agent Framework workflow: workflow.py build_workflow()</text>
+
+<!-- start -->
+<rect x="500" y="110" width="200" height="50" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="600" y="132" text-anchor="middle" font-size="14" font-weight="bold">start</text>
+<text x="600" y="150" text-anchor="middle">stores sos_id</text>
+<line x1="600" y1="160" x2="600" y2="200" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="612" y="185" font-size="12">sos_id: str</text>
+
+<!-- guard -->
+<rect x="450" y="200" width="300" height="70" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="600" y="222" text-anchor="middle" font-size="14" font-weight="bold">guard</text>
+<text x="600" y="242" text-anchor="middle">PII redaction + injection screen</text>
+<text x="600" y="260" text-anchor="middle">code, optional Prompt Shields</text>
+
+<line x1="750" y1="235" x2="830" y2="235" stroke="#374151" stroke-width="1.6" stroke-dasharray="5,3" marker-end="url(#ah)"/>
+<text x="790" y="227" text-anchor="middle" font-size="12">optional</text>
+<rect x="830" y="200" width="230" height="70" rx="8" fill="#EDE4F7" stroke="#6D28D9" stroke-width="1.5"/>
+<text x="945" y="228" text-anchor="middle" font-weight="bold">Azure AI Content Safety</text>
+<text x="945" y="250" text-anchor="middle">Prompt Shields</text>
+
+<!-- guard switch -->
+<line x1="480" y1="270" x2="250" y2="350" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="345" y="282" text-anchor="end" font-size="12" font-weight="bold">Case g.blocked</text>
+<text x="345" y="298" text-anchor="end" font-size="12">Gate(sos_id, blocked)</text>
+<line x1="600" y1="270" x2="600" y2="350" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="612" y="304" font-size="12" font-weight="bold">Default</text>
+<text x="612" y="320" font-size="12">Gate(sos_id, blocked)</text>
+
+<rect x="120" y="350" width="260" height="80" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="250" y="374" text-anchor="middle" font-size="14" font-weight="bold">review_queue</text>
+<text x="250" y="396" text-anchor="middle">status BLOCKED</text>
+<text x="250" y="416" text-anchor="middle">an officer reads it</text>
+
+<rect x="450" y="350" width="300" height="80" rx="8" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="600" y="374" text-anchor="middle" font-size="14" font-weight="bold">intake</text>
+<text x="600" y="396" text-anchor="middle">reads the cleaned free text:</text>
+<text x="600" y="416" text-anchor="middle">language, people, water, risks</text>
+
+<!-- fan-out -->
+<line x1="560" y1="430" x2="450" y2="490" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="640" y1="430" x2="750" y2="490" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="505" y="450" text-anchor="end" font-size="12">sos_id: str</text>
+<text x="695" y="450" font-size="12">sos_id: str</text>
+<text x="600" y="468" text-anchor="middle" font-size="12" font-weight="bold">fan-out: run in parallel</text>
+
+<rect x="330" y="490" width="240" height="70" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="450" y="516" text-anchor="middle" font-size="14" font-weight="bold">geo</text>
+<text x="450" y="538" text-anchor="middle">place, district, river</text>
+<rect x="630" y="490" width="240" height="70" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="750" y="516" text-anchor="middle" font-size="14" font-weight="bold">verifier</text>
+<text x="750" y="538" text-anchor="middle">duplicate? plausible?</text>
+
+<!-- fan-in -->
+<line x1="450" y1="560" x2="560" y2="630" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="750" y1="560" x2="640" y2="630" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="470" y="596" text-anchor="end" font-size="12">&quot;geo&quot;</text>
+<text x="730" y="596" font-size="12">&quot;verifier&quot;</text>
+<text x="600" y="604" text-anchor="middle" font-size="12" font-weight="bold">fan-in: list[str]</text>
+
+<!-- triage -->
+<rect x="450" y="630" width="300" height="80" rx="8" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="600" y="654" text-anchor="middle" font-size="14" font-weight="bold">triage</text>
+<text x="600" y="676" text-anchor="middle">priority P1 to P4, at most one level</text>
+<text x="600" y="696" text-anchor="middle">from SOP (bound_priority)</text>
+
+<rect x="830" y="635" width="250" height="70" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="955" y="660" text-anchor="middle" font-size="14" font-weight="bold">router.choose()</text>
+<text x="955" y="682" text-anchor="middle">picks fast or strong tier</text>
+<line x1="830" y1="670" x2="750" y2="670" stroke="#374151" stroke-width="1.6" stroke-dasharray="5,3" marker-end="url(#ah)"/>
+
+<!-- triage switch -->
+<line x1="480" y1="710" x2="290" y2="790" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="360" y="736" text-anchor="end" font-size="12" font-weight="bold">Case need == &quot;information&quot;</text>
+<text x="360" y="752" text-anchor="end" font-size="12">Routed(sos_id, need)</text>
+<line x1="600" y1="710" x2="600" y2="790" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="612" y="744" font-size="12" font-weight="bold">Default</text>
+<text x="612" y="760" font-size="12">Routed(sos_id, need)</text>
+
+<rect x="150" y="790" width="280" height="96" rx="8" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="290" y="814" text-anchor="middle" font-size="14" font-weight="bold">info_desk</text>
+<text x="290" y="836" text-anchor="middle">answers a question</text>
+<text x="290" y="856" text-anchor="middle">calls specialists.commander</text>
+<text x="290" y="876" text-anchor="middle">status INFO_SENT</text>
+
+<rect x="470" y="790" width="260" height="80" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="600" y="814" text-anchor="middle" font-size="14" font-weight="bold">allocate</text>
+<text x="600" y="836" text-anchor="middle">nearest fitting asset + ETA</text>
+<text x="600" y="856" text-anchor="middle">plain code</text>
+
+<line x1="730" y1="830" x2="800" y2="830" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="765" y="822" text-anchor="middle" font-size="12">sos_id</text>
+
+<rect x="800" y="790" width="290" height="96" rx="8" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="945" y="814" text-anchor="middle" font-size="14" font-weight="bold">commander</text>
+<text x="945" y="836" text-anchor="middle">writes the plan for approval</text>
+<text x="945" y="858" text-anchor="middle">status AWAITING_APPROVAL</text>
+
+<!-- officer -->
+<line x1="945" y1="886" x2="945" y2="950" stroke="#374151" stroke-width="1.6" stroke-dasharray="5,3" marker-end="url(#ah)"/>
+<text x="933" y="934" text-anchor="end" font-size="12">outside the graph</text>
+<rect x="770" y="950" width="350" height="70" rx="8" fill="#DFF3E3" stroke="#15803D" stroke-width="1.5"/>
+<text x="945" y="978" text-anchor="middle" font-size="14" font-weight="bold">Duty officer approves or rejects</text>
+<text x="945" y="1000" text-anchor="middle">pipeline.Pipeline.decide()</text>
+
+<!-- legend -->
+<rect x="60" y="944" width="16" height="16" rx="3" fill="#FCE3C8" stroke="#C2410C"/>
+<text x="84" y="957">model step</text>
+<rect x="260" y="944" width="16" height="16" rx="3" fill="#DCEBFA" stroke="#1D4ED8"/>
+<text x="284" y="957">plain code</text>
+<rect x="60" y="974" width="16" height="16" rx="3" fill="#DFF3E3" stroke="#15803D"/>
+<text x="84" y="987">person</text>
+<rect x="260" y="974" width="16" height="16" rx="3" fill="#EDE4F7" stroke="#6D28D9"/>
+<text x="284" y="987">external service</text>
+<text x="60" y="1016" font-size="12">Model steps go through llm.complete_json() and fall back to SOP rules.</text>
+</g>
+</svg>

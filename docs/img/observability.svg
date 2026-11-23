@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1200" height="700" viewBox="0 0 1200 700" font-family="Arial, Helvetica, sans-serif">
+  <rect width="100%" height="100%" fill="#F7F3EA"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606A"/>
+    </marker>
+  </defs>
+
+  <text x="600" y="34" font-size="22" font-weight="bold" fill="#1F2328" text-anchor="middle">Observability: four paths out of the app</text>
+  <text x="600" y="56" font-size="14" fill="#57606A" text-anchor="middle">Metrics, traces, logs, and the live event stream that drives the wall</text>
+
+  <!-- App container -->
+  <rect x="20" y="70" width="585" height="525" rx="12" fill="#FBF8F2" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="8 5"/>
+  <text x="35" y="92" font-size="14" font-weight="bold" fill="#1F2328">Inside the app (FastAPI, one container)</text>
+
+  <!-- Row 1: metrics -->
+  <text x="1180" y="92" font-size="13" font-weight="bold" fill="#1D4ED8" text-anchor="end">1. Metrics</text>
+  <rect x="40" y="105" width="320" height="125" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="200" y="127" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">metrics.py</text>
+  <text x="200" y="147" font-size="12" fill="#1F2328" text-anchor="middle">prometheus_client registry:</text>
+  <text x="200" y="163" font-size="12" fill="#1F2328" text-anchor="middle">counters, histograms, gauges</text>
+  <text x="200" y="179" font-size="12" fill="#1F2328" text-anchor="middle">low-cardinality labels, no SOS or device ids</text>
+  <text x="200" y="201" font-size="12" fill="#1F2328" text-anchor="middle">pipeline._ticker sets the ledger</text>
+  <text x="200" y="217" font-size="12" fill="#1F2328" text-anchor="middle">gauges every 0.5 s</text>
+
+  <rect x="420" y="130" width="170" height="75" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="505" y="155" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">GET /metrics</text>
+  <text x="505" y="175" font-size="12" fill="#1F2328" text-anchor="middle">Bearer METRICS_TOKEN</text>
+
+  <rect x="630" y="105" width="240" height="125" rx="8" fill="#EDE4F7" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="750" y="127" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">Prometheus</text>
+  <text x="750" y="147" font-size="12" fill="#1F2328" text-anchor="middle">prom/prometheus v3.1.0 (Docker)</text>
+  <text x="750" y="163" font-size="12" fill="#1F2328" text-anchor="middle">scrapes every 5 s</text>
+  <text x="750" y="185" font-size="12" fill="#1F2328" text-anchor="middle">prometheus.yml is written by</text>
+  <text x="750" y="201" font-size="12" fill="#1F2328" text-anchor="middle">infra/observability.sh</text>
+
+  <rect x="910" y="105" width="270" height="125" rx="8" fill="#EDE4F7" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="1045" y="127" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">Grafana</text>
+  <text x="1045" y="147" font-size="12" fill="#1F2328" text-anchor="middle">grafana/grafana 11.4.0 on :3000</text>
+  <text x="1045" y="163" font-size="12" fill="#1F2328" text-anchor="middle">anonymous viewer</text>
+  <text x="1045" y="185" font-size="12" fill="#1F2328" text-anchor="middle">infra/grafana/dashboards/rahat.json</text>
+  <text x="1045" y="201" font-size="12" fill="#1F2328" text-anchor="middle">15 panels</text>
+
+  <line x1="360" y1="167" x2="420" y2="167" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="630" y1="167" x2="590" y2="167" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="870" y1="167" x2="910" y2="167" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="890" y="158" font-size="12" fill="#57606A" text-anchor="middle">query</text>
+
+  <!-- Row 2: traces -->
+  <text x="1180" y="262" font-size="13" font-weight="bold" fill="#1D4ED8" text-anchor="end">2. Traces</text>
+  <rect x="40" y="270" width="320" height="90" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="200" y="292" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">telemetry.py setup_telemetry()</text>
+  <text x="200" y="312" font-size="12" fill="#1F2328" text-anchor="middle">OpenTelemetry FastAPI instrumentation</text>
+  <text x="200" y="330" font-size="12" fill="#1F2328" text-anchor="middle">only when this is set:</text>
+  <text x="200" y="346" font-size="12" fill="#1F2328" text-anchor="middle">APPLICATIONINSIGHTS_CONNECTION_STRING</text>
+
+  <rect x="630" y="280" width="550" height="70" rx="8" fill="#EDE4F7" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="905" y="308" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">Azure Monitor: Application Insights (rahat-appi)</text>
+  <text x="905" y="328" font-size="12" fill="#1F2328" text-anchor="middle">request traces; /metrics, /healthz, /readyz and /api/stream are left out</text>
+  <line x1="360" y1="315" x2="630" y2="315" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="495" y="306" font-size="12" fill="#57606A" text-anchor="middle">traces</text>
+
+  <!-- Row 3: logs -->
+  <text x="1180" y="382" font-size="13" font-weight="bold" fill="#1D4ED8" text-anchor="end">3. Logs</text>
+  <rect x="40" y="390" width="320" height="80" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+  <text x="200" y="414" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">policy.AuditLog</text>
+  <text x="200" y="434" font-size="12" fill="#1F2328" text-anchor="middle">append-only</text>
+  <text x="200" y="450" font-size="12" fill="#1F2328" text-anchor="middle">one JSON line per entry on stdout</text>
+
+  <rect x="630" y="395" width="240" height="70" rx="8" fill="#EDE4F7" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="750" y="424" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">Container Apps logs</text>
+  <text x="750" y="444" font-size="12" fill="#1F2328" text-anchor="middle">console stream of the app</text>
+
+  <rect x="910" y="395" width="270" height="70" rx="8" fill="#EDE4F7" stroke="#6D28D9" stroke-width="1.5"/>
+  <text x="1045" y="424" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">Log Analytics</text>
+  <text x="1045" y="444" font-size="12" fill="#1F2328" text-anchor="middle">workspace rahat-logs</text>
+  <line x1="360" y1="430" x2="630" y2="430" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="495" y="421" font-size="12" fill="#57606A" text-anchor="middle">stdout</text>
+  <line x1="870" y1="430" x2="910" y2="430" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Row 4: live stream -->
+  <text x="1180" y="502" font-size="13" font-weight="bold" fill="#1D4ED8" text-anchor="end">4. Live wall</text>
+  <rect x="40" y="505" width="320" height="75" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="200" y="529" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">events.py Bus</text>
+  <text x="200" y="549" font-size="12" fill="#1F2328" text-anchor="middle">each agent step emits an event;</text>
+  <text x="200" y="565" font-size="12" fill="#1F2328" text-anchor="middle">the ticker publishes state twice a second</text>
+
+  <rect x="420" y="505" width="170" height="75" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="505" y="529" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">GET /api/stream</text>
+  <text x="505" y="549" font-size="12" fill="#1F2328" text-anchor="middle">Server-Sent Events</text>
+  <text x="505" y="565" font-size="12" fill="#1F2328" text-anchor="middle">officer login needed</text>
+
+  <rect x="630" y="505" width="240" height="75" rx="8" fill="#DFF3E3" stroke="#15803D" stroke-width="1.5"/>
+  <text x="750" y="529" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">wall.js and console.js</text>
+  <text x="750" y="549" font-size="12" fill="#1F2328" text-anchor="middle">live wall and officer console,</text>
+  <text x="750" y="565" font-size="12" fill="#1F2328" text-anchor="middle">watched by people in the room</text>
+  <line x1="360" y1="542" x2="420" y2="542" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="590" y1="542" x2="630" y2="542" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Legend -->
+  <rect x="20" y="614" width="16" height="16" fill="#DCEBFA" stroke="#1D4ED8"/>
+  <text x="42" y="627" font-size="13" fill="#1F2328">app code</text>
+  <rect x="130" y="614" width="16" height="16" fill="#FFF6C7" stroke="#A16207"/>
+  <text x="152" y="627" font-size="13" fill="#1F2328">record</text>
+  <rect x="225" y="614" width="16" height="16" fill="#EDE4F7" stroke="#6D28D9"/>
+  <text x="247" y="627" font-size="13" fill="#1F2328">external tool or Azure service</text>
+  <rect x="460" y="614" width="16" height="16" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="482" y="627" font-size="13" fill="#1F2328">people watching</text>
+
+  <text x="600" y="672" font-size="15" font-style="italic" fill="#1F2328" text-anchor="middle">Metrics say that something is wrong, logs say where, traces say why.</text>
+</svg>

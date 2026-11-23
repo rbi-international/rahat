@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1200" height="760" viewBox="0 0 1200 760" font-family="Arial, Helvetica, sans-serif">
+<rect width="100%" height="100%" fill="#F7F3EA"/>
+<g fill="#1F2328" font-size="13">
+<text x="30" y="42" font-size="22" font-weight="bold">Where RAHAT keeps what it knows</text>
+<text x="30" y="66">Five memories plus the PII vault. Each box names the file, what it holds, and when it is cleared.</text>
+
+<!-- a -->
+<rect x="30" y="90" width="360" height="260" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="48" y="118" font-size="15" font-weight="bold">(a) Run state for one SOS</text>
+<text x="48" y="144">Agent Framework WorkflowContext state</text>
+<text x="48" y="166">workflow.py:</text>
+<text x="64" y="188">ctx.set_state(&quot;sos_id&quot;) in start</text>
+<text x="64" y="208">ctx.set_state(&quot;clean_text&quot;) in guard</text>
+<text x="64" y="228">ctx.set_state(&quot;router&quot;) in triage</text>
+<text x="48" y="250">Read back with ctx.get_state()</text>
+<line x1="46" y1="306" x2="374" y2="306" stroke="#A16207" stroke-width="1"/>
+<text x="48" y="330" font-weight="bold">Cleared: lives for one workflow run</text>
+
+<!-- b -->
+<rect x="420" y="90" width="360" height="260" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="438" y="118" font-size="15" font-weight="bold">(b) Incident board</text>
+<text x="438" y="144">store.py: Store._items</text>
+<text x="438" y="166">dict[sos_id, Incident]</text>
+<text x="438" y="194">A blackboard: each agent writes</text>
+<text x="438" y="214">its own field of the Incident.</text>
+<text x="438" y="236">Later agents read earlier fields here.</text>
+<line x1="436" y1="306" x2="764" y2="306" stroke="#A16207" stroke-width="1"/>
+<text x="438" y="330" font-weight="bold">Cleared: /api/admin/reset</text>
+
+<!-- c -->
+<rect x="810" y="90" width="360" height="260" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="828" y="118" font-size="15" font-weight="bold">(c) Event history</text>
+<text x="828" y="144">events.py: Bus._recent</text>
+<text x="828" y="166">deque(maxlen=300) + the last tick</text>
+<text x="828" y="194">Replayed to a new SSE subscriber.</text>
+<text x="828" y="216">Each subscriber queue: maxsize 500,</text>
+<text x="828" y="236">drops the oldest when full.</text>
+<line x1="826" y1="306" x2="1154" y2="306" stroke="#A16207" stroke-width="1"/>
+<text x="828" y="330" font-weight="bold">Cleared: /api/admin/reset</text>
+
+<!-- d -->
+<rect x="30" y="380" width="360" height="260" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="48" y="408" font-size="15" font-weight="bold">(d) Router beliefs</text>
+<text x="48" y="434">router.py: Router.arms</text>
+<text x="48" y="456">{context: {fast: Arm(alpha, beta, pulls),</text>
+<text x="112" y="476">strong: Arm}}</text>
+<text x="48" y="498">+ history of every decision</text>
+<text x="48" y="526">Updated by officer decisions:</text>
+<text x="48" y="546">approve or reject teaches the tier choice.</text>
+<line x1="46" y1="596" x2="374" y2="596" stroke="#A16207" stroke-width="1"/>
+<text x="48" y="620" font-weight="bold">Cleared: /api/admin/reset</text>
+
+<!-- e -->
+<rect x="420" y="380" width="360" height="260" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="438" y="408" font-size="15" font-weight="bold">(e) Ledger + audit</text>
+<text x="438" y="434">ledger.py: Ledger</text>
+<text x="438" y="454">_used, _reserved, _by_agent, _calls,</text>
+<text x="438" y="474">allocation</text>
+<text x="438" y="502">guardrails/policy.py: AuditLog</text>
+<text x="438" y="522">deque(maxlen=5000), also printed as</text>
+<text x="438" y="542">JSON lines to stdout (Log Analytics)</text>
+<line x1="436" y1="576" x2="764" y2="576" stroke="#A16207" stroke-width="1"/>
+<text x="438" y="600" font-weight="bold">Cleared: ledger by /api/admin/reset;</text>
+<text x="438" y="620" font-weight="bold">audit is kept, oldest drop after 5000</text>
+
+<!-- f -->
+<rect x="810" y="380" width="360" height="260" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="828" y="408" font-size="15" font-weight="bold">PII vault</text>
+<text x="828" y="434">guardrails/pii.py: Vault</text>
+<text x="828" y="462">Real phone, Aadhaar and email values,</text>
+<text x="828" y="482">kept by SOS id and redaction token.</text>
+<text x="828" y="510">Officer-only. Models and replies</text>
+<text x="828" y="530">only ever see the redacted text.</text>
+<line x1="826" y1="596" x2="1154" y2="596" stroke="#A16207" stroke-width="1"/>
+<text x="828" y="620" font-weight="bold">Cleared: /api/admin/reset</text>
+
+<!-- note -->
+<rect x="30" y="664" width="1140" height="64" rx="8" fill="#FFFDF8" stroke="#8A8270" stroke-width="1.2"/>
+<text x="48" y="690" font-weight="bold">All of this is in process memory, in a single replica. A restart clears it.</text>
+<text x="48" y="712">store.py is the swap point for Redis or Cosmos DB if the room ever needs more than one replica.</text>
+</g>
+</svg>

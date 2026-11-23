@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1200" height="900" viewBox="0 0 1200 900" font-family="Arial, Helvetica, sans-serif">
+<rect width="100%" height="100%" fill="#F7F3EA"/>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker>
+</defs>
+<g fill="#1F2328" font-size="13">
+<text x="30" y="40" font-size="22" font-weight="bold">How data moves: edges, the board, and the screens</text>
+<rect x="760" y="22" width="16" height="16" rx="3" fill="#FCE3C8" stroke="#C2410C"/>
+<text x="784" y="35">model step</text>
+<rect x="880" y="22" width="16" height="16" rx="3" fill="#DCEBFA" stroke="#1D4ED8"/>
+<text x="904" y="35">plain code</text>
+<rect x="1000" y="22" width="16" height="16" rx="3" fill="#FFF6C7" stroke="#A16207"/>
+<text x="1024" y="35">state</text>
+
+<!-- ============ lane 1 ============ -->
+<rect x="20" y="56" width="1160" height="210" rx="10" fill="#FFFDF8" stroke="#D6CFC0" stroke-width="1.2"/>
+<text x="36" y="80" font-size="15" font-weight="bold">1. Edge messages (Agent Framework)</text>
+
+<rect x="50" y="150" width="100" height="50" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="100" y="180" text-anchor="middle" font-weight="bold">guard</text>
+<line x1="150" y1="175" x2="310" y2="175" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="230" y="166" text-anchor="middle" font-size="12">Gate(sos_id, blocked)</text>
+
+<rect x="310" y="150" width="100" height="50" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="360" y="180" text-anchor="middle" font-weight="bold">intake</text>
+<line x1="410" y1="175" x2="520" y2="148" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="410" y1="175" x2="520" y2="202" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="465" y="140" text-anchor="middle" font-size="12">sos_id: str</text>
+
+<rect x="520" y="130" width="110" height="36" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="575" y="153" text-anchor="middle" font-weight="bold">geo</text>
+<rect x="520" y="184" width="110" height="36" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="575" y="207" text-anchor="middle" font-weight="bold">verifier</text>
+<line x1="630" y1="148" x2="790" y2="166" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="630" y1="202" x2="790" y2="184" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="710" y="140" text-anchor="middle" font-size="12">&quot;geo&quot;, &quot;verifier&quot;</text>
+<text x="710" y="224" text-anchor="middle" font-size="12">fan-in: list[str]</text>
+
+<rect x="790" y="150" width="100" height="50" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="840" y="180" text-anchor="middle" font-weight="bold">triage</text>
+<line x1="890" y1="175" x2="1050" y2="148" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="890" y1="175" x2="1050" y2="202" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="970" y="140" text-anchor="middle" font-size="12">Routed(sos_id, need)</text>
+
+<rect x="1050" y="130" width="115" height="36" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+<text x="1107" y="153" text-anchor="middle" font-weight="bold">info_desk</text>
+<rect x="1050" y="184" width="115" height="36" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="1107" y="207" text-anchor="middle" font-weight="bold">allocate</text>
+
+<text x="36" y="252">Edges carry only ids and small decisions. allocate sends sos_id: str to commander; a blocked Gate goes to review_queue.</text>
+
+<!-- ============ lane 2 ============ -->
+<rect x="20" y="282" width="1160" height="350" rx="10" fill="#FFFDF8" stroke="#D6CFC0" stroke-width="1.2"/>
+<text x="36" y="306" font-size="15" font-weight="bold">2. The board: Incident fields (models.py) and who writes them</text>
+
+<rect x="50" y="320" width="720" height="298" rx="8" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+<text x="66" y="344" font-weight="bold" fill="#7C4A03">field</text>
+<text x="360" y="344" font-weight="bold" fill="#7C4A03">written by</text>
+<line x1="62" y1="352" x2="758" y2="352" stroke="#A16207" stroke-width="1"/>
+<g>
+<text x="66" y="373" font-weight="bold">sos</text><text x="360" y="373">gateway: pipeline.submit()</text>
+<text x="66" y="396" font-weight="bold">status</text><text x="360" y="396">every node</text>
+<text x="66" y="419" font-weight="bold">redactions, flags, blocked_reason</text><text x="360" y="419">guard</text>
+<text x="66" y="442" font-weight="bold">extraction</text><text x="360" y="442">intake</text>
+<text x="66" y="465" font-weight="bold">location</text><text x="360" y="465">geo</text>
+<text x="66" y="488" font-weight="bold">verification</text><text x="360" y="488">verifier</text>
+<text x="66" y="511" font-weight="bold">triage</text><text x="360" y="511">triage</text>
+<text x="66" y="534" font-weight="bold">assignment</text><text x="360" y="534">allocate, also pipeline.reallocate()</text>
+<text x="66" y="557" font-weight="bold">plan</text><text x="360" y="557">commander or info_desk</text>
+<text x="66" y="580" font-weight="bold">tokens_used, llm_calls, degraded</text><text x="360" y="580">_charge() after each model call</text>
+<text x="66" y="603" font-weight="bold">decided_at</text><text x="360" y="603">officer: pipeline.decide()</text>
+</g>
+
+<text x="800" y="350">Each node writes only its own field.</text>
+<text x="800" y="372">Later nodes read earlier fields from</text>
+<text x="800" y="394">the board, not from the edge message.</text>
+<text x="800" y="430">After a change, the pipeline publishes</text>
+<text x="800" y="452">inc.public_view() as an incident event.</text>
+<text x="800" y="488">The board lives in store.py.</text>
+
+
+<!-- ============ lane 3 ============ -->
+<rect x="20" y="648" width="1160" height="232" rx="10" fill="#FFFDF8" stroke="#D6CFC0" stroke-width="1.2"/>
+<text x="36" y="672" font-size="15" font-weight="bold">3. SSE events (events.py Bus.publish)</text>
+
+<rect x="40" y="690" width="800" height="176" rx="8" fill="none" stroke="#8A8270" stroke-width="1.2" stroke-dasharray="6,4"/>
+
+<rect x="50" y="704" width="220" height="76" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="62" y="726" font-size="14" font-weight="bold">agent</text>
+<text x="62" y="748" font-size="12">emit() lines from each node</text>
+<rect x="285" y="704" width="220" height="76" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="297" y="726" font-size="14" font-weight="bold">incident</text>
+<text x="297" y="748" font-size="12">inc.public_view()</text>
+<rect x="520" y="704" width="310" height="76" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="532" y="726" font-size="14" font-weight="bold">tick</text>
+<text x="532" y="748" font-size="12">ledger, queue, in_flight, assets, stats</text>
+<text x="532" y="768" font-size="12">every 0.5 s from pipeline._ticker</text>
+
+<rect x="50" y="790" width="220" height="66" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="62" y="812" font-size="14" font-weight="bold">inject</text>
+<text x="62" y="834" font-size="12">drill injects</text>
+<rect x="285" y="790" width="220" height="66" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="297" y="812" font-size="14" font-weight="bold">asset</text>
+<text x="297" y="834" font-size="12">boat or team status</text>
+<rect x="520" y="790" width="310" height="66" rx="6" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="532" y="812" font-size="14" font-weight="bold">score</text>
+<text x="532" y="834" font-size="12">drill score</text>
+
+<line x1="840" y1="780" x2="900" y2="780" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="870" y="772" text-anchor="middle" font-size="12">SSE</text>
+<rect x="900" y="730" width="260" height="100" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="1030" y="760" text-anchor="middle" font-size="14" font-weight="bold">wall.js and console.js</text>
+<text x="1030" y="784" text-anchor="middle">EventSource(&apos;/api/stream&apos;)</text>
+<text x="1030" y="806" text-anchor="middle" font-size="12">a new subscriber gets the history</text>
+
+<!-- board to lane 3 -->
+<line x1="395" y1="618" x2="395" y2="704" stroke="#374151" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="405" y="670" font-size="12">public_view()</text>
+</g>
+</svg>

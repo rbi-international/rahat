@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1200" height="700" viewBox="0 0 1200 700" font-family="Arial, Helvetica, sans-serif">
+  <rect width="100%" height="100%" fill="#F7F3EA"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606A"/>
+    </marker>
+  </defs>
+
+  <text x="600" y="36" font-size="22" font-weight="bold" fill="#1F2328" text-anchor="middle">Why SOS to plan fell from 57 s to 4 s</text>
+  <text x="600" y="60" font-size="14" fill="#57606A" text-anchor="middle">src/rahat/workflow.py, build_workflow(). Only three nodes are drawn; the others behave the same.</text>
+
+  <!-- ===== BEFORE ===== -->
+  <rect x="20" y="80" width="570" height="510" rx="12" fill="#FDFBF6" stroke="#8C959F" stroke-width="1.5"/>
+  <text x="40" y="108" font-size="18" font-weight="bold" fill="#1F2328">Before: v1.0.1</text>
+  <text x="40" y="134" font-size="13" fill="#1F2328">Executors were defined once at module level with @executor</text>
+  <text x="40" y="152" font-size="13" fill="#1F2328">and shared by every workflow run. Agent Framework runs each</text>
+  <text x="40" y="170" font-size="13" fill="#1F2328">executor instance under its own asyncio.Lock (_workflows/_executor.py),</text>
+  <text x="40" y="188" font-size="13" fill="#1F2328">so each node handled one SOS at a time across the whole app,</text>
+  <text x="40" y="206" font-size="13" fill="#1F2328">whatever WORKERS was set to.</text>
+
+  <rect x="40" y="240" width="90" height="40" rx="6" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="85" y="265" font-size="13" fill="#1F2328" text-anchor="middle">SOS 1</text>
+  <rect x="40" y="300" width="90" height="40" rx="6" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="85" y="325" font-size="13" fill="#1F2328" text-anchor="middle">SOS 2</text>
+  <rect x="40" y="360" width="90" height="40" rx="6" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="85" y="385" font-size="13" fill="#1F2328" text-anchor="middle">SOS 3</text>
+
+  <rect x="200" y="290" width="110" height="60" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="255" y="325" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">intake</text>
+  <rect x="340" y="290" width="100" height="60" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="390" y="325" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">triage</text>
+  <rect x="470" y="290" width="105" height="60" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="522" y="325" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">commander</text>
+
+  <!-- padlocks -->
+  <path d="M291,280 L291,273 A7,7 0 0 1 305,273 L305,280" fill="none" stroke="#A16207" stroke-width="2.5"/>
+  <rect x="286" y="279" width="24" height="18" rx="3" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+  <path d="M421,280 L421,273 A7,7 0 0 1 435,273 L435,280" fill="none" stroke="#A16207" stroke-width="2.5"/>
+  <rect x="416" y="279" width="24" height="18" rx="3" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+  <path d="M556,280 L556,273 A7,7 0 0 1 570,273 L570,280" fill="none" stroke="#A16207" stroke-width="2.5"/>
+  <rect x="551" y="279" width="24" height="18" rx="3" fill="#FFF6C7" stroke="#A16207" stroke-width="1.5"/>
+
+  <line x1="130" y1="260" x2="200" y2="303" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="130" y1="320" x2="200" y2="320" stroke="#57606A" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <line x1="130" y1="380" x2="200" y2="337" stroke="#57606A" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <line x1="310" y1="320" x2="340" y2="320" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="440" y1="320" x2="470" y2="320" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="200" y="380" font-size="12" fill="#57606A">dashed: SOS 2 and 3 wait for the lock</text>
+
+  <rect x="40" y="420" width="530" height="50" rx="6" fill="#FFF6C7" stroke="#A16207"/>
+  <text x="305" y="450" font-size="13" fill="#1F2328" text-anchor="middle">One shared instance per node, one lock per instance: one SOS at a time.</text>
+
+  <rect x="40" y="495" width="530" height="75" rx="8" fill="#FFFFFF" stroke="#8C959F"/>
+  <text x="305" y="522" font-size="13" fill="#57606A" text-anchor="middle">Live run, 140 students</text>
+  <text x="305" y="552" font-size="22" font-weight="bold" fill="#1F2328" text-anchor="middle">median 57.3 s, SOS to plan</text>
+
+  <!-- ===== AFTER ===== -->
+  <rect x="610" y="80" width="570" height="510" rx="12" fill="#FDFBF6" stroke="#8C959F" stroke-width="1.5"/>
+  <text x="630" y="108" font-size="18" font-weight="bold" fill="#1F2328">After: v1.0.2 (commit 82e3122)</text>
+  <text x="630" y="134" font-size="13" fill="#1F2328">build_workflow() creates fresh executors for every SOS:</text>
+  <rect x="630" y="144" width="530" height="28" rx="4" fill="#EFEBE3" stroke="#C9C1B1"/>
+  <text x="642" y="163" font-size="13" fill="#1F2328">n = {i: executor(id=i)(f) for i, f in NODES.items()}</text>
+  <text x="630" y="194" font-size="13" fill="#1F2328">Each SOS gets its own graph, so their model calls overlap.</text>
+
+  <rect x="630" y="240" width="90" height="40" rx="6" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="675" y="265" font-size="13" fill="#1F2328" text-anchor="middle">SOS 1</text>
+  <rect x="630" y="300" width="90" height="40" rx="6" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="675" y="325" font-size="13" fill="#1F2328" text-anchor="middle">SOS 2</text>
+  <rect x="630" y="360" width="90" height="40" rx="6" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="675" y="385" font-size="13" fill="#1F2328" text-anchor="middle">SOS 3</text>
+
+  <rect x="760" y="240" width="110" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="815" y="265" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">intake</text>
+  <rect x="900" y="240" width="100" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="950" y="265" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">triage</text>
+  <rect x="1030" y="240" width="120" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="1090" y="265" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">commander</text>
+
+  <rect x="760" y="300" width="110" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="815" y="325" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">intake</text>
+  <rect x="900" y="300" width="100" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="950" y="325" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">triage</text>
+  <rect x="1030" y="300" width="120" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="1090" y="325" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">commander</text>
+
+  <rect x="760" y="360" width="110" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="815" y="385" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">intake</text>
+  <rect x="900" y="360" width="100" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="950" y="385" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">triage</text>
+  <rect x="1030" y="360" width="120" height="40" rx="6" fill="#FCE3C8" stroke="#C2410C" stroke-width="1.5"/>
+  <text x="1090" y="385" font-size="14" font-weight="bold" fill="#1F2328" text-anchor="middle">commander</text>
+
+  <line x1="720" y1="260" x2="760" y2="260" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="870" y1="260" x2="900" y2="260" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="1000" y1="260" x2="1030" y2="260" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="720" y1="320" x2="760" y2="320" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="870" y1="320" x2="900" y2="320" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="1000" y1="320" x2="1030" y2="320" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="720" y1="380" x2="760" y2="380" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="870" y1="380" x2="900" y2="380" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="1000" y1="380" x2="1030" y2="380" stroke="#57606A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="630" y="420" width="530" height="50" rx="6" fill="#DCEBFA" stroke="#1D4ED8"/>
+  <text x="895" y="450" font-size="13" fill="#1F2328" text-anchor="middle">No executor instance is shared between SOS, so no lock is shared either.</text>
+
+  <rect x="630" y="495" width="530" height="75" rx="8" fill="#FFFFFF" stroke="#8C959F"/>
+  <text x="895" y="522" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Live check, 40 students: median 4.1 s, p90 4.6 s</text>
+  <text x="895" y="550" font-size="15" font-weight="bold" fill="#1F2328" text-anchor="middle">Live run, 140 students: median 4.3 s, p90 5.1 s</text>
+
+  <!-- Test -->
+  <rect x="20" y="610" width="1160" height="50" rx="8" fill="#DCEBFA" stroke="#1D4ED8" stroke-width="1.5"/>
+  <text x="600" y="640" font-size="14" fill="#1F2328" text-anchor="middle"><tspan font-weight="bold">Regression test:</tspan> tests/test_workflow_concurrency.py runs 10 SOS at once, offline; at least 8 model calls must overlap.</text>
+
+  <!-- Legend -->
+  <rect x="20" y="672" width="16" height="16" fill="#DFF3E3" stroke="#15803D"/>
+  <text x="42" y="685" font-size="13" fill="#1F2328">citizen SOS</text>
+  <rect x="140" y="672" width="16" height="16" fill="#FCE3C8" stroke="#C2410C"/>
+  <text x="162" y="685" font-size="13" fill="#1F2328">model-backed node</text>
+  <rect x="300" y="672" width="16" height="16" fill="#FFF6C7" stroke="#A16207"/>
+  <text x="322" y="685" font-size="13" fill="#1F2328">lock</text>
+</svg>
